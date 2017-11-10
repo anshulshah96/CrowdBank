@@ -34,7 +34,7 @@ contract CrowdBank {
     
     function newLoan(uint amount, uint dueDate) returns(bool) {
         if(LoanMap[msg.sender].borrower != address(0x0)) return false;
-        Loan memory newLoan;
+        Loan storage newLoan;
         newLoan.borrower = msg.sender;
         newLoan.state = State.Accepting;
         newLoan.amount = amount;
@@ -43,15 +43,16 @@ contract CrowdBank {
         return true;
     }
     
-    function newProposal(address borrower, uint rate, uint amount) returns(bool) {
+    function newProposal(address borrower, uint rate) payable returns(bool) {
         if(LoanMap[borrower].borrower == address(0x0)) return false;
         Proposal memory newProposal;
         newProposal.lender = msg.sender;
         newProposal.rate = rate;
-        newProposal.amount = amount;
+        newProposal.amount = msg.value;
         LoanMap[borrower].proposals.push(newProposal);
         return true;
     }
     
+    function () payable {}
     
 }
