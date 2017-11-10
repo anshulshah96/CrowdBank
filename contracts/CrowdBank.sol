@@ -43,62 +43,52 @@ contract CrowdBank {
         owner = msg.sender;
     }
 
-    modifier hasNoActiveLoan() {
-        uint validLoans = loanMap[msg.sender].length;
-        require(validLoans != 0);
-        Loan obj = loanList[loanMap[msg.sender][validLoans-1]];
-        require(loanList[validLoans-1].state != LoanState.ACCEPTING);
-        require(loanList[validLoans-1].state != LoanState.LOCKED);
-        _;
+    function hasActiveLoan(address borrower) constant returns(bool) {
+        uint validLoans = loanMap[borrower].length;
+        if(validLoans == 0) return false;
+        Loan obj = loanList[loanMap[borrower][validLoans-1]];
+        if(loanList[validLoans-1].state == LoanState.ACCEPTING) return true;
+        if(loanList[validLoans-1].state == LoanState.LOCKED) return true;
+        return false;
     }
     
-    function newLoan(uint amount, uint dueDate) hasNoActiveLoan {
-        Loan storage nLoan;
-        nLoan.borrower = msg.sender;
-        nLoan.state = LoanState.ACCEPTING;
-        nLoan.amount = amount;
-        nLoan.dueDate = dueDate;
-        nLoan.collected = 0;
-        nLoan.proposalCount = 0;
-
-        loanList.push(nLoan);
+    function newLoan(uint amount, uint dueDate) {
+        if(hasActiveLoan(msg.sender)) return;
+        loanList.push(Loan(msg.sender, LoanState.ACCEPTING, dueDate, amount, 0, 0));
         loanMap[msg.sender].push(loanList.length-1);
     }
 
     function newProposal(uint loanId, uint rate) payable {
         if(loanList[loanId].borrower == 0 || loanList[loanId].state != LoanState.ACCEPTING)
-            throw;
+            return;
         //TODO: check condition where msg.value > loan amount : we should return the msg ether
-        Proposal storage nProposal;
-        nProposal.loanId = loanId;
-        nProposal.rate = rate;
-        nProposal.state = ProposalState.WAITING;
-        nProposal.amount = msg.value;
-
-        proposalList.push(nProposal);
+        proposalList.push(Proposal(loanId, ProposalState.WAITING, rate, msg.value));
         lendMap[msg.sender].push(proposalList.length-1);
+        loanList[loanId].proposalCount++;
     }
 
     function getActiveLoanId(address borrower) constant returns(uint) {
         uint numLoans = loanMap[borrower].length;
-        if(numLoans == 0) return (2**256 - 1);
+        if(numLoans == 0) return (2**64 - 1);
         uint lastLoanId = loanMap[borrower][numLoans-1];
-        if(loanList[lastLoanId].state != LoanState.ACCEPTING) return (2**256 - 1);
+        if(loanList[lastLoanId].state != LoanState.ACCEPTING) return (2**64 - 1);
         return lastLoanId;
     }
 
     function takeActionOnProposal(uint proposeId, ProposalState newState) {
         uint loanId = getActiveLoanId(msg.sender); 
-        if(loanId == (2**256 - 1)) throw;
+        if(loanId == (2**64 - 1)) return;
         Proposal pObj = proposalList[proposeId];
-        if(pObj.loanId != loanId) throw;
+        if(pObj.loanId != loanId) return;
         Loan lObj = loanList[loanId];
-        if(lObj.state == LoanState.LOCKED) throw;
+        if(lObj.state == LoanState.LOCKED) return;
 
         if(newState == ProposalState.ACCEPTED) {
             // Do not allow loan collection to be more than predefined value
-            if(lObj.collected + pObj.amount > lObj.amount) throw;
+            if(lObj.collected + pObj.amount > lObj.amount) return;
             else proposalList[proposeId].state = newState;
+            loanList[loanId].state = LoanState.LOCKED;
+            loanList[loanId].collected = lObj.collected + pObj.amount;
         }
         else if(newState == ProposalState.WAITING){
             
@@ -116,9 +106,18 @@ contract CrowdBank {
         return lendMap[lender].length;
     }
 
+    function getLoanDetailsById(uint loanId) constant returns(LoanState, uint, uint) {
+        Loan obj = loanList[loanId];
+        return (obj.state, obj.dueDate, obj.amount);
+    }
+
     function getLoanDetailsByAddressPosition(address borrower, uint pos) constant returns(LoanState, uint, uint) {
         Loan obj = loanList[loanMap[borrower][pos]];
         return (obj.state, obj.dueDate, obj.amount);
+    }
+
+    function getLoanMapFor(address borrower) constant returns(uint[]) {
+        return loanMap[borrower];
     }
 
     function getProposalDetailsByLoanIdPosition(uint loanId, uint numI) constant returns(ProposalState, uint, uint) {
