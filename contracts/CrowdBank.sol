@@ -68,4 +68,12 @@ contract CrowdBank {
         LoanMap[borrower][validLoans-1].proposals.push(nProposal);
         return true;
     }
+
+    function totalLoansBy(address borrower) constant returns(uint) {
+        return LoanMap[borrower].length;
+    }
+
+    function totalProposalsBy(address lender) constant returns(uint) {
+        return LendMap[lender].length;
+    }
 }

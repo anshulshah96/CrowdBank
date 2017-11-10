@@ -1,14 +1,29 @@
-var MetaCoin = artifacts.require("./MetaCoin.sol");
+var CrowdBank = artifacts.require("./CrowdBank.sol");
 
-contract('MetaCoin', function(accounts) {
-  it("should put 10000 MetaCoin in the first account", function() {
-    return MetaCoin.deployed().then(function(instance) {
-      return instance.getBalance.call(accounts[0]);
-    }).then(function(balance) {
-      assert.equal(balance.valueOf(), 10000, "10000 wasn't in the first account");
+var account_one = web3.eth.accounts[0];
+var account_two = web3.eth.accounts[1];
+
+contract('CrowdBank', function(accounts) {
+  
+  it("should allow people to propose loan and people to lend on it", function() {
+    var instanceObj;
+    return CrowdBank.deployed().then(function(instance) {
+      instanceObj = instance;
+      return instance.newLoan(1000, 100000, {from:account_one});
+    }).then(function(transaction) {
+      console.log(transaction);
+      return instanceObj.totalLoansBy.call(account_one);
+    }).then(function(response) {
+      assert.equal(response.valueOf(), 1, "Loan not proposed");
+      return instanceObj.newProposal(account_one, 10, {value: 100, from: account_two})
+    }).then(function(transaction) {
+      return instanceObj.totalProposalsBy.call(account_two);
+    }).then(function(response) {
+      assert.equal(response.valueOf(), 1, "Proposal not submitted");
     });
   });
-  it("should call a function that depends on a linked library", function() {
+  
+  /*it("should call a function that depends on a linked library", function() {
     var meta;
     var metaCoinBalance;
     var metaCoinEthBalance;
@@ -60,5 +75,6 @@ contract('MetaCoin', function(accounts) {
       assert.equal(account_one_ending_balance, account_one_starting_balance - amount, "Amount wasn't correctly taken from the sender");
       assert.equal(account_two_ending_balance, account_two_starting_balance + amount, "Amount wasn't correctly sent to the receiver");
     });
-  });
+  });*/
+
 });
