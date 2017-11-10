@@ -20,6 +20,7 @@ contract CrowdBank {
         address borrower;
         State state;
         uint dueDate;
+        uint amount;
         Proposal[] proposals;
     }
     
@@ -31,9 +32,15 @@ contract CrowdBank {
         owner = msg.sender;
     }
     
-    function newLoan(address borrower, State state, uint dueDate) returns(bool) {
-        if(LoanMap[borrower].borrower != address(0x0)) return false;
-        
+    function newLoan(uint amount, uint dueDate) returns(bool) {
+        if(LoanMap[msg.sender].borrower != address(0x0)) return false;
+        Loan memory newLoan;
+        newLoan.borrower = msg.sender;
+        newLoan.state = State.Accepting;
+        newLoan.amount = amount;
+        newLoan.dueDate = dueDate;
+        LoanMap[msg.sender] = newLoan;
+        return true;
     }
     
     function newProposal(address borrower, uint rate, uint amount) returns(bool) {
