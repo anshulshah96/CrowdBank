@@ -69,11 +69,43 @@ contract CrowdBank {
         return true;
     }
 
+    function acceptProposal(uint proposeId) {
+        uint validLoans = LoanMap[msg.sender].length;
+        if(validLoans == 0 || LoanMap[msg.sender][validLoans-1].state != State.ACCEPTING)
+            return;
+
+        uint numProposals = LoanMap[msg.sender][validLoans-1].proposals.length;
+        Loan lObj = LoanMap[msg.sender][validLoans-1];
+        Proposal pObj = LoanMap[msg.sender][validLoans-1].proposals[proposeId];
+
+        for(uint i = 0; i<numProposals; i++) {
+            if(i != proposeId) {
+                LoanMap[msg.sender][validLoans-1].proposals[i].state = ProposalState.REJECTED;
+            }
+            else {
+                LoanMap[msg.sender][validLoans-1].proposals[i].state = ProposalState.ACCEPTED;
+            }
+        }
+        lObj.state = State.LOCKED;
+        pObj.state = ProposalState.ACCEPTED;
+        // TODO: update LendMap for other reject proposals
+    }
+
     function totalLoansBy(address borrower) constant returns(uint) {
         return LoanMap[borrower].length;
     }
 
     function totalProposalsBy(address lender) constant returns(uint) {
         return LendMap[lender].length;
+    }
+
+    function getLoanDetailsByNumber(address borrower, uint pos) constant returns(State, uint, uint) {
+        Loan obj = LoanMap[borrower][pos];
+        return (obj.state, obj.dueDate, obj.amount);
+    }
+
+    function getLoanProposalDetails(address borrower, uint loanId, uint proposeId) constant returns(ProposalState, uint, uint) {
+        Proposal obj = LoanMap[borrower][loanId].proposals[proposeId];
+        return (obj.state, obj.rate, obj.amount);
     }
 }
