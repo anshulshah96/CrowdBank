@@ -3,17 +3,24 @@ contract CrowdBank {
     
     address public owner;
     
+    enum ProposalState {
+        WAITING,
+        ACCEPTED,
+        REJECTED
+    }
+
     struct Proposal {
         address lender;
+        ProposalState state;
         uint rate;
         uint amount;
     }
     
     enum State {
-        Accepting,
-        Locked,
-        CompletedSuccess,
-        CompletedFail
+        ACCEPTING,
+        LOCKED,
+        COMPLETEDSUCCESS,
+        COMPLETEDFAIL
     }
     
     struct Loan {
@@ -23,36 +30,42 @@ contract CrowdBank {
         uint amount;
         Proposal[] proposals;
     }
-    
-    Loan[] public CompletedLoan;
-    
-    mapping (address=>Loan) public LoanMap;
-    
+
+    mapping (address=>Loan[]) public LoanMap;
+    mapping (address=>Proposal[]) public LendMap;
+
     function CrowdBank() {
         owner = msg.sender;
     }
     
     function newLoan(uint amount, uint dueDate) returns(bool) {
-        if(LoanMap[msg.sender].borrower != address(0x0)) return false;
-        Loan storage newLoan;
-        newLoan.borrower = msg.sender;
-        newLoan.state = State.Accepting;
-        newLoan.amount = amount;
-        newLoan.dueDate = dueDate;
-        LoanMap[msg.sender] = newLoan;
-        return true;
+        uint validLoans = LoanMap[msg.sender].length;
+        if(validLoans == 0 || (LoanMap[msg.sender][validLoans-1].state != State.ACCEPTING && LoanMap[msg.sender][validLoans-1].state != State.LOCKED))
+        {
+            Loan storage nLoan;
+            nLoan.borrower = msg.sender;
+            nLoan.state = State.ACCEPTING;
+            nLoan.amount = amount;
+            nLoan.dueDate = dueDate;
+            LoanMap[msg.sender].push(nLoan);
+            return true;
+        }
+        else
+            return false;
     }
     
     function newProposal(address borrower, uint rate) payable returns(bool) {
-        if(LoanMap[borrower].borrower == address(0x0)) return false;
-        Proposal memory newProposal;
-        newProposal.lender = msg.sender;
-        newProposal.rate = rate;
-        newProposal.amount = msg.value;
-        LoanMap[borrower].proposals.push(newProposal);
+        uint validLoans = LoanMap[borrower].length;
+        if(validLoans == 0 || LoanMap[borrower][validLoans-1].state != State.ACCEPTING)
+            return false;
+        Proposal storage nProposal;
+        nProposal.lender = msg.sender;
+        nProposal.rate = rate;
+        nProposal.state = ProposalState.WAITING;
+        nProposal.amount = msg.value;
+
+        LendMap[msg.sender].push(nProposal);
+        LoanMap[borrower][validLoans-1].proposals.push(nProposal);
         return true;
     }
-    
-    function () payable {}
-    
 }
