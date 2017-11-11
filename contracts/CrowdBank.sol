@@ -144,8 +144,39 @@ contract CrowdBank {
         return loanMap[borrower];
     }
 
+    function getLastLoanState() constant returns(LoanState) {
+        uint loanLength = loanMap[msg.sender].length;
+        if(loanLength == 0)
+            return LoanState.SUCCESSFUL;
+        return loanList[loanMap[msg.sender][loanLength -1]].state;
+    }
+
+    function getLastLoanDetails() constant returns(LoanState, uint, uint, uint, uint) {
+        uint loanLength = loanMap[msg.sender].length;
+        if(loanLength == 0)
+            throw;
+        Loan obj = loanList[loanMap[msg.sender][loanLength -1]];
+        return (obj.state, obj.dueDate, obj.amount, obj.proposalCount, obj.collected);        
+    }
+
     function getProposalDetailsByLoanIdPosition(uint loanId, uint numI) constant returns(ProposalState, uint, uint) {
         Proposal obj = proposalList[loanList[loanId].proposal[numI]];
         return (obj.state, obj.rate, obj.amount);
+    }
+
+    function makeLoanRepayment(uint loanId) {
+        //Make repayment of all proposals
+        uint loanLength = loanMap[msg.sender].length;
+        if(loanLength == 0)
+            throw;
+        Loan obj = loanList[loanMap[msg.sender][loanLength-1]];
+        if(obj.state == LOCKED)
+        {
+            
+        }
+        else
+        {
+            throw;
+        }
     }
 }
