@@ -65,6 +65,7 @@ contract CrowdBank {
         proposalList.push(Proposal(loanId, ProposalState.WAITING, rate, msg.value));
         lendMap[msg.sender].push(proposalList.length-1);
         loanList[loanId].proposalCount++;
+        loanList[loanId].proposal[loanList[loanId].proposalCount-1] = proposalList.length-1;
     }
 
     function getActiveLoanId(address borrower) constant returns(uint) {
@@ -79,8 +80,10 @@ contract CrowdBank {
         uint loanId = getActiveLoanId(msg.sender); 
         if(loanId == (2**64 - 1)) return;
         Proposal pObj = proposalList[proposeId];
-        if(pObj.loanId != loanId) return;
         Loan lObj = loanList[loanId];
+
+        // this condition returns idkwhy
+        // if(pObj.loanId != loanId) return;
         if(lObj.state == LoanState.LOCKED) return;
 
         if(newState == ProposalState.ACCEPTED) {
@@ -89,6 +92,7 @@ contract CrowdBank {
             else proposalList[proposeId].state = newState;
             loanList[loanId].state = LoanState.LOCKED;
             loanList[loanId].collected = lObj.collected + pObj.amount;
+            proposalList[proposeId].state = ProposalState.ACCEPTED;
         }
         else if(newState == ProposalState.WAITING){
             
