@@ -10,6 +10,7 @@ contract CrowdBank {
     }
 
     struct Proposal {
+        address lender;
         uint loanId;
         ProposalState state;
         uint rate;
@@ -62,7 +63,7 @@ contract CrowdBank {
         if(loanList[loanId].borrower == 0 || loanList[loanId].state != LoanState.ACCEPTING)
             return;
         //TODO: check condition where msg.value > loan amount : we should return the msg ether
-        proposalList.push(Proposal(loanId, ProposalState.WAITING, rate, msg.value));
+        proposalList.push(Proposal(msg.sender, loanId, ProposalState.WAITING, rate, msg.value));
         lendMap[msg.sender].push(proposalList.length-1);
         loanList[loanId].proposalCount++;
         loanList[loanId].proposal[loanList[loanId].proposalCount-1] = proposalList.length-1;
@@ -99,6 +100,25 @@ contract CrowdBank {
         }
         else {
 
+        }
+    }
+
+    // The loan is locked/accepting and the due date passed : transfer the mortgage
+    function revokeProposal(uint proposeId) {
+        if(msg.sender != proposalList[proposeId].lender) return;
+        uint loanId = proposalList[proposeId].loanId;
+        if(loanList[loanId].state == LoanState.ACCEPTING) {
+            // Revoking not allowed
+        }
+        else if(loanList[loanId].state == LoanState.LOCKED) {
+            if(loanList[loanId].dueDate < now) return;
+            loanList[loanId].state = LoanState.FAILED;
+            for(uint i = 0; i < loanList[loanId].proposalCount; i++) {
+                uint numI = loanList[loanId].proposal[i];
+                if(proposalList[numI].state == ProposalState.ACCEPTED) {
+                    // transfer mortgage 
+                }
+            } 
         }
     }
 
