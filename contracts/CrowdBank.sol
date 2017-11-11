@@ -170,7 +170,7 @@ contract CrowdBank {
         if(loanLength == 0)
             throw;
         Loan obj = loanList[loanMap[msg.sender][loanLength-1]];
-        if(obj.state == LOCKED)
+        if(obj.state == LoanState.LOCKED)
         {
             
         }
