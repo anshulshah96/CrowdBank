@@ -188,4 +188,8 @@ contract CrowdBank {
         return (obj.state, obj.rate, obj.amount);
     }
 
+    function numTotalLoans() constant returns(uint) {
+        return loanList.length;
+    }
+
 }
