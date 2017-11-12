@@ -1,11 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MetaCoin - Truffle Webpack Demo w/ Frontend</title>
+  <title>Lender Page</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-  <script src="./lender.js"></script>
+   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+   <style>
+    .margin-top-3 {
+      margin-top: 3em;
+    }
+  </style>
 </head>
-<body>
-  <h1> List of your Lending Proposals: </h1>
+<body class="container">
+  <h1> Hi! Loan Lender </h1>
+  <div class="col-sm-7 margin-top-3">
+    <h2>List of Proposals Submitted: </h2>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Lender</th>
+            <th>LoanId</th>
+            <th>Loan State</th>
+            <th>Rate</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="proposal-rows">
+        </tbody>
+      </table>
+    </div>
+    <div class="container-fluid">
+
+    </div>
+  </div> 
 </body>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+<script src="lender.js"></script>
 </html>

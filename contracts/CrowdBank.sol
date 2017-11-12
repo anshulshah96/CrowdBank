@@ -168,7 +168,7 @@ contract CrowdBank {
         //Make repayment of all proposals
         uint loanLength = loanMap[msg.sender].length;
         if(loanLength == 0)
-            throw;
+            return;
         Loan obj = loanList[loanMap[msg.sender][loanLength-1]];
         if(obj.state == LoanState.LOCKED)
         {
@@ -176,7 +176,12 @@ contract CrowdBank {
         }
         else
         {
-            throw;
+            return;
         }
+    }
+
+    function getProposalAtPosFor(address lender, uint pos) constant returns(address, uint, ProposalState, uint, uint) {
+        Proposal prop = proposalList[lendMap[lender][pos]];
+        return (prop.lender, prop.loanId, prop.state, prop.rate, prop.amount);
     }
 }
