@@ -12,6 +12,7 @@ var CrowdBank = contract(bank_artifacts);
 let proposals = [];
 var account;
 let loanList = [];
+var wtoE;
 
 function populateProposals() {
   CrowdBank.deployed().then(function(contractInstance) {
@@ -20,7 +21,13 @@ function populateProposals() {
       $("#proposal-rows").empty();
       for(var i = 0; i < proposalLength; i++) {
         contractInstance.getProposalAtPosFor.call(account, i).then(function(el) {
-          $("#proposal-rows").append("<tr><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + el[2].valueOf()  + "</td><td>" + el[3].valueOf() + "</td><td>" + el[4].valueOf() + "</td></tr>");
+          $("#proposal-rows").append("<tr>\
+            <td>" + el[0].valueOf() + "</td>\
+            <td>" + el[1].valueOf() + "</td>\
+            <td>" + el[2].valueOf()  + "</td>\
+            <td>" + el[3].valueOf() + "</td>\
+            <td>" + el[4].valueOf()/wtoE + "</td>\
+            </tr>");
         });
       }
     });
@@ -32,7 +39,7 @@ window.calli = function(id) {
   var rate = $('#lendrate'+id).val();
   console.log("Lending " + amount + " Ether to LoanId " + id);
   CrowdBank.deployed().then(function(contractInstance) {
-    contractInstance.newProposal(id, rate, {value: amount, from: account, gas: 2000000}).then(function(transaction) {
+    contractInstance.newProposal(id, rate, {value: web3.toWei(amount,'ether'), from: account, gas: 2000000}).then(function(transaction) {
         console.log(transaction);
     });
   })
@@ -49,8 +56,17 @@ function populateRecentLoans() {
         contractInstance.loanList(numLoans-1-i).then(function(el) {
           var loanId = (numLoans-1-(ccount));
           var actionHTML = 
-          "<input type='number' id='lendinput"+loanId+"'></input><input type='number' id='lendrate"+loanId+"'></input><button onclick='calli("+loanId+")'>Do</button>";
-          $("#recent-loan-rows").append("<tr><td>" + (numLoans-1-(ccount++)) + "</td><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + Date(el[2].valueOf())  + "</td><td>" + el[3].valueOf() + "</td><td>" + actionHTML  + "</td><tr>");
+            "<input type='number' id='lendinput"+loanId+"'></input>\
+            <input type='number' id='lendrate"+loanId+"'></input>\
+            <button onclick='calli("+loanId+")'>Do</button>";
+          $("#recent-loan-rows").append("<tr>\
+            <td>" + (numLoans-1-(ccount++)) + "</td>\
+            <td>" + el[0].valueOf() + "</td>\
+            <td>" + el[1].valueOf() + "</td>\
+            <td>" + Date(el[2].valueOf())  + "</td>\
+            <td>" + el[3].valueOf()/wtoE + "</td>\
+            <td>" + actionHTML  + "</td>\
+            <tr>");
         });
       }
     });
@@ -69,9 +85,10 @@ $( document ).ready(function() {
   }
 
   web3.eth.getAccounts(function(err, accs) {
+    wtoE = web3.toWei(1,'ether');
     account = accs[0];
     $('#account-number').html(account);
-    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/web3.toWei(1,'ether'));
+    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/wtoE);
   });
 
   CrowdBank.setProvider(web3.currentProvider);

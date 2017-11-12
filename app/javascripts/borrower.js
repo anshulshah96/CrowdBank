@@ -9,6 +9,7 @@ import bank_artifacts from '../../build/contracts/CrowdBank.json'
 
 var CrowdBank = contract(bank_artifacts);
 var account;
+var wtoE;
 
 var LOANSTATE = {
   0 : "ACCEPTING",
@@ -44,7 +45,7 @@ function showPastLoans() {
           var newRowContent = '<tr class="'+LOANSTATECLASS[el[0].valueOf()]+'">\
             <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
             <td>'+Date(el[1].valueOf())+'</td>\
-            <td>'+el[2].valueOf()+'</td>\
+            <td>'+el[2].valueOf()/wtoE+'</td>\
             <td>'+el[3].valueOf()+'</td>\
             <td>'+el[4].valueOf()+'</td>\
             <td>'+el[5].valueOf()+'</td>\
@@ -63,7 +64,7 @@ function displayForm() {
 function newLoan(amount, date) {
   CrowdBank.deployed().then(function(contractInstance) {
     // contractInstance.defaultAccount = account;
-    contractInstance.newLoan(amount,date,{gas: 1400000, from: account}).then(function() {
+    contractInstance.newLoan(web3.toWei(amount,'ether'),date,{gas: 1400000, from: account}).then(function() {
       console.log("CREATED NEW LOAN");
     });
   });
@@ -81,6 +82,7 @@ $( document ).ready(function() {
   }
   web3.eth.getAccounts(function(err, accs) {
     account = accs[0];
+    wtoE = web3.toWei(1,'ether');
     $('#account-number').html(account);
     $('#account-balance').html(web3.eth.getBalance(account).valueOf()/web3.toWei(1,'ether'));
   });
