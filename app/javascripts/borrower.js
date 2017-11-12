@@ -22,49 +22,68 @@ var LOANSTATECLASS = {
   2 : "success",
   3 : "danger"
 }
+var LOANSTATEACTION = {
+  0 : '<button class="btn btn-danger">LOCK</button>',
+  1 : '<button class="btn btn-success">REPAY</button>',
+  2 : '-',
+  3 : '-'
+}
+
+function getLoanState() {
+  CrowdBank.deployed().then(function(contractInstance) {
+    console.log(account);
+    contractInstance.getLastLoanState.call(account).then(function(loanState) {
+      if(loanState.valueOf() == 2 || loanState.valueOf() == 3)
+      {
+        displayForm();
+      }
+    });
+  });
+}
 
 function showPastLoans() {
   CrowdBank.deployed().then(function(contractInstance) {
     console.log("CONTRACT : ",contractInstance);
+    console.log(account);
     contractInstance.totalLoansBy.call(account).then(function(loanCount) {
       console.log("GOT NUMBER OF LOANS : ",loanCount.valueOf());
       if(loanCount.valueOf() != 0)
       {
-        console.log("GETTING LOAN STATE");
-        // getLoanState();
+        getLoanState();
+        for(let i=0;i< loanCount.valueOf();i++)
+        {
+          contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(el) {
+            console.log(el);
+            var newRowContent = '<tr class="'+LOANSTATECLASS[el[0].valueOf()]+'">\
+              <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
+              <td>'+Date(el[1].valueOf())+'</td>\
+              <td>'+el[2].valueOf()+'</td>\
+              <td>'+el[3].valueOf()+'</td>\
+              <td>'+el[4].valueOf()+'</td>\
+              <td>'+el[5].valueOf()+'</td>\
+              <td><button>Details</button></td>\
+              <td>'+LOANSTATEACTION[el[0].valueOf()]+'</td>\
+            </tr>';
+            $("#loan-rows tbody").prepend(newRowContent);
+          });
+        }
       }
       else
       {
         displayForm();
       }
-      for(let i=0;i< loanCount.valueOf();i++)
-      {
-        contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(el) {
-          console.log(el);
-          var newRowContent = '<tr class="'+LOANSTATECLASS[el[0].valueOf()]+'">\
-            <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
-            <td>'+Date(el[1].valueOf())+'</td>\
-            <td>'+el[2].valueOf()+'</td>\
-            <td>'+el[3].valueOf()+'</td>\
-            <td>'+el[4].valueOf()+'</td>\
-            <td>'+el[5].valueOf()+'</td>\
-          </tr>';
-          $("#loan-rows tbody").append(newRowContent);
-        });
-      }
     });
   });
-
 }
+
 function displayForm() {
   document.getElementById('newloan-form').style.display = 'block';
 }
 
 function newLoan(amount, date) {
   CrowdBank.deployed().then(function(contractInstance) {
-    // contractInstance.defaultAccount = account;
     contractInstance.newLoan(amount,date,{gas: 1400000, from: account}).then(function() {
-      console.log("CREATED NEW LOAN");
+      window.href = '/borrower.html';
     });
   });
 }
