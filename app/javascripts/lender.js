@@ -70,7 +70,8 @@ $( document ).ready(function() {
 
   web3.eth.getAccounts(function(err, accs) {
     account = accs[0];
-    $("h1").html("<h1> Hi! Loan Lender " + account +  "</h1>");
+    $('#account-number').html(account);
+    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/web3.toWei(1,'ether'));
   });
 
   CrowdBank.setProvider(web3.currentProvider);
