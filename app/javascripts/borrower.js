@@ -1,5 +1,5 @@
 // Import the page's CSS. Webpack will know what to do with it.
-import "../stylesheets/app.css";
+// import "../stylesheets/app.css";
 
 // Import libraries we need.
 import { default as Web3} from 'web3';
@@ -10,15 +10,21 @@ import bank_artifacts from '../../build/contracts/CrowdBank.json'
 var CrowdBank = contract(bank_artifacts);
 var account;
 
+var LOANSTATE = {
+  0 : "ACCEPTING",
+  1 : "LOCKED",
+  2 : "COMPLETED SUCCESSFUL",
+  3 : "COMPLETION FAILED"
+}
+
 function showPastLoans() {
-  account = web3.eth.accounts[0];
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.totalLoansBy.call(account).then(function(loanCount) {
       console.log("GOT NUMBER OF LOANS : ",loanCount.valueOf());
       if(loanCount.valueOf() != 0)
       {
         console.log("GETTING LOAN STATE");
-        getLoanState();
+        // getLoanState();
       }
       else
       {
@@ -26,9 +32,10 @@ function showPastLoans() {
       }
       for(let i=0;i< loanCount.valueOf();i++)
       {
-        contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(details) {
-          $("#loan-rows").append("<tr><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + el[2].valueOf()  + "</td><td>" + el[3].valueOf() + "</td><td>" + el[4].valueOf() + "</td></tr>");
-          $('#loan-rows').DataTable();
+        contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(el) {
+          console.log(el);
+          var table = $('#loan-rows').DataTable();
+          var rowNode = table.row.add([LOANSTATE[el[0].valueOf()],Date(el[1].valueOf()),el[2].valueOf(),el[3].valueOf(),el[4].valueOf(),el[5].valueOf(),"<button>Details!</button>"]).draw().node();
         });
       }
     });
@@ -39,26 +46,27 @@ function displayForm() {
   document.getElementById('newloan-form').style.display = 'block';
 }
 
-function getLoanState() {
-  account = web3.eth.accounts[0];
-  CrowdBank.deployed().then(function(contractInstance) {
-    console.log(account);
-    contractInstance.getLastLoanState.call(account).then(function(LoanState) {
-      if(LoanState == 0)
-      {
-        displayForm();
-      }
-      else
-      {
-        getLastLoanDetails();
-      }
-    });
-  });
-}
+// function getLoanState() {
+//   CrowdBank.deployed().then(function(contractInstance) {
+//     contractInstance.getLastLoanState.call(account).then(function(LoanState) {
+//       if(LoanState == 0)
+//       {
+//         displayForm();
+//       }
+//       else
+//       {
+//         getLastLoanDetails();
+//       }
+//     });
+//   });
+// }
 
 function newLoan(amount, date) {
   CrowdBank.deployed().then(function(contractInstance) {
-    contractInstance.newLoan(amount,date);
+    // contractInstance.defaultAccount = account;
+    contractInstance.newLoan(amount,date,{gas: 1400000, from: account}).then(function() {
+      console.log("CREATED NEW LOAN");
+    });
   });
 }
 
@@ -73,7 +81,7 @@ $( document ).ready(function() {
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://172.25.12.128:8545"));
   }
   web3.eth.getAccounts(function(err, accs) {
-    account = accs[0];
+    account = accs[3];
   });
 
 
@@ -82,6 +90,18 @@ $( document ).ready(function() {
     var amount = $('#newloan-amount').val();
     var date = new Date($('#newloan-date').val()).getTime()/1000;
     newLoan(amount,date);
+  });
+
+  $('#loan-rows tbody').on( 'click', 'button', function () {
+    var table = $('#loan-rows').DataTable();
+    var data = table.row( $(this).parents('tr') ).data();
+    var loanId = data[5];
+    console.log(loanId);
+    CrowdBank.deployed().then(function(contractInstance) {
+      contractInstance.getLoanDetailsById.call(loanId).then(function(data) {
+        console.log(data);
+      });
+    });
   });
 
   CrowdBank.setProvider(web3.currentProvider);

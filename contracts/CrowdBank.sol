@@ -154,11 +154,6 @@ contract CrowdBank {
         }
     }
 
-    function getLoanDetailsById(uint loanId) constant returns(LoanState, uint, uint) {
-        Loan obj = loanList[loanId];
-        return (obj.state, obj.dueDate, obj.amount);
-    }
-
     function getProposalAtPosFor(address lender, uint pos) constant returns(address, uint, ProposalState, uint, uint) {
         Proposal prop = proposalList[lendMap[lender][pos]];
         return (prop.lender, prop.loanId, prop.state, prop.rate, prop.amount);
@@ -170,9 +165,9 @@ contract CrowdBank {
         return loanMap[borrower].length;
     }
 
-    function getLoanDetailsByAddressPosition(address borrower, uint pos) constant returns(LoanState, uint, uint, uint, uint) {
+    function getLoanDetailsByAddressPosition(address borrower, uint pos) constant returns(LoanState, uint, uint, uint, uint, uint) {
         Loan obj = loanList[loanMap[borrower][pos]];
-        return (obj.state, obj.dueDate, obj.amount, obj.proposalCount, obj.collected);
+        return (obj.state, obj.dueDate, obj.amount, obj.proposalCount, obj.collected, loanMap[borrower][pos]);
     }
 
     function getLastLoanState(address borrower) constant returns(LoanState) {
