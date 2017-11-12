@@ -23,7 +23,6 @@ function populateProposals() {
           $("#proposal-rows").append("<tr><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + el[2].valueOf()  + "</td><td>" + el[3].valueOf() + "</td><td>" + el[4].valueOf() + "</td></tr>");
         });
       }
-      setupProposalRows();
     });
   });
 }
