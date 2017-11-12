@@ -1,61 +1,82 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Lender Page</title>
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
-   <style>
-    .margin-top-3 {
-      margin-top: 3em;
-    }
-  </style>
-</head>
-<body class="container">
-  <h1> Hi! Loan Lender </h1>
-  <div class="col-sm-12 margin-top-3">
-    <h2>List of Proposals Submitted: </h2>
-    <div class="table-responsive">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Lender</th>
-            <th>LoanId</th>
-            <th>Proposal State</th>
-            <th>Rate</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody id="proposal-rows">
-        </tbody>
-      </table>
-    </div>
-    <div class="container-fluid">
+<html lang="en">
 
-    </div>
-  </div>
-  <div class="col-sm-12 margin-top-3">
-    <div class="row">
-      <h2>List of Recent Loans</h2>
-      <div class="table-responsive">
-        <table class="table table-bordered">
-          <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>LoanId</th>
-              <th>Borrower</th>
-              <th>Loan State</th>
-              <th>Due Date</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody id="recent-loan-rows">
-          </tbody>
-        </table>
-        </table>
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Lender - Crowd Bank</title>
+    <!-- Bootstrap core CSS -->
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <!-- Custom fonts for this template -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-inverse bg-inverse">
+      <a class="navbar-brand text-white" href="/">
+        Crowd Bank
+      </a>
+      <a class="navbar-brand navbar-right">
+        Proffer Block Chain Hackathon 2017
+      </a>
+    </nav>
+
+        <!-- Header -->
+    <header class="intro-header">
+      <div class="container">
+        <div class="intro-message">
+          <h1>Hi! Lender</h1>
+          <h4>Welcome to Crowd Bank</h4>
+          <hr class="intro-divider">
+          <h5>Your Account Address : <span id="account-number"></span></h5>
+          <h5>Your Account Balance : <span id="account-balance"></span> ethereum</h5>
+          <hr class="intro-divider">
+          <h4><b>Your List of Proposals</b></h4>
+          <div class="row">
+            <div class="col-sm-12">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Lender</th>
+                    <th>LoanId</th>
+                    <th>Proposal State</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="proposal-rows">
+                </tbody>
+              </table>
+            </div>
+            <div class="col-sm-12">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>LoanId</th>
+                    <th>Borrower</th>
+                    <th>Loan State</th>
+                    <th>Due Date</th>
+                    <th>Amount</th>
+                    <th>Take Action</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-loan-rows">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</body>
-<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
-<script src="lender.js"></script>
+    </header>
+
+  </body>
+  <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+  <script src="lender.js"></script>
 </html>

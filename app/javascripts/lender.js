@@ -1,5 +1,5 @@
-// Import the page's CSS. Webpack will know what to do with it.
-import "../stylesheets/app.css";
+// // Import the page's CSS. Webpack will know what to do with it.
+// import "../stylesheets/app.css";
 
 // Import libraries we need.
 import { default as Web3} from 'web3';
@@ -27,6 +27,18 @@ function populateProposals() {
   });
 }
 
+window.calli = function(id) {
+  var amount = $('#lendinput'+id).val();
+  var rate = $('#lendrate'+id).val();
+  console.log("Lending " + amount + " Ether to LoanId " + id);
+  CrowdBank.deployed().then(function(contractInstance) {
+    contractInstance.newProposal(id, rate, {value: amount, from: account, gas: 2000000}).then(function(transaction) {
+        console.log(transaction);
+    });
+  })
+
+}
+
 function populateRecentLoans() {
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.numTotalLoans.call().then(function(numLoans) {
@@ -35,7 +47,10 @@ function populateRecentLoans() {
       var ccount = 0;
       for(var i = 0; i < 10 && numLoans-1-i >= 0; i++) {
         contractInstance.loanList(numLoans-1-i).then(function(el) {
-          $("#recent-loan-rows").append("<tr><td>" + (numLoans-1-(ccount++)) + "</td><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + Date(el[2].valueOf())  + "</td><td>" + el[3].valueOf() + "</td><tr>");
+          var loanId = (numLoans-1-(ccount));
+          var actionHTML = 
+          "<input type='number' id='lendinput"+loanId+"'></input><input type='number' id='lendrate"+loanId+"'></input><button onclick='calli("+loanId+")'>Do</button>";
+          $("#recent-loan-rows").append("<tr><td>" + (numLoans-1-(ccount++)) + "</td><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + Date(el[2].valueOf())  + "</td><td>" + el[3].valueOf() + "</td><td>" + actionHTML  + "</td><tr>");
         });
       }
     });
