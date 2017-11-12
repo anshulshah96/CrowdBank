@@ -9,6 +9,7 @@ import bank_artifacts from '../../build/contracts/CrowdBank.json'
 
 var CrowdBank = contract(bank_artifacts);
 var account;
+var wtoE;
 
 var LOANSTATE = {
   0 : "ACCEPTING",
@@ -82,8 +83,9 @@ function displayForm() {
 
 function newLoan(amount, date) {
   CrowdBank.deployed().then(function(contractInstance) {
-    contractInstance.newLoan(amount,date,{gas: 1400000, from: account}).then(function() {
-      window.href = '/borrower.html';
+    // contractInstance.defaultAccount = account;
+    contractInstance.newLoan(web3.toWei(amount,'ether'),date,{gas: 1400000, from: account}).then(function() {
+      console.log("CREATED NEW LOAN");
     });
   });
 }
@@ -100,8 +102,9 @@ $( document ).ready(function() {
   }
   web3.eth.getAccounts(function(err, accs) {
     account = accs[0];
+    wtoE = web3.toWei(1,'ether');
     $('#account-number').html(account);
-    $('#account-balance').html(web3.eth.getBalance(account).valueOf());
+    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/web3.toWei(1,'ether'));
   });
 
   document.getElementById('newloan-form').addEventListener('submit', function(evt){
