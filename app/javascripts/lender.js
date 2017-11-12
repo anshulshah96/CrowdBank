@@ -11,22 +11,16 @@ var CrowdBank = contract(bank_artifacts);
 
 let proposals = [];
 var account;
-
-function asyncLoadProposalsFunction (callback) {
-  contractInstance.getProposalAtPosFor.call(account, i).then(function(proposal) {
-    proposals.push(proposal);
-  });
-  return callback()
-}
+let loanList = [];
 
 function populateProposals() {
-  account = web3.eth.accounts[0];
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.totalProposalsBy.call(account).then(function(proposalLength) {
       proposals = [];
-      for(let i=0; i < proposalLength.valueOf(); ) {
-        asyncLoadProposalsFunction(function () {
-          i++;
+      $("#proposal-rows").empty();
+      for(var i = 0; i < proposalLength; i++) {
+        contractInstance.getProposalAtPosFor.call(account, i).then(function(el) {
+          $("#proposal-rows").append("<tr><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + el[2].valueOf()  + "</td><td>" + el[3].valueOf() + "</td><td>" + el[4].valueOf() + "</td></tr>");
         });
       }
       setupProposalRows();
@@ -34,10 +28,19 @@ function populateProposals() {
   });
 }
 
-function setupProposalRows() {
-  proposals.map(function(el) {
-    $("#proposal-rows").append("<tr><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + el[2].valueOf()  + "</td><td>" + el[3].valueOf() + "</td><td>" + el[4].valueOf() + "</td></tr>");
-  });
+function populateRecentLoans() {
+  CrowdBank.deployed().then(function(contractInstance) {
+    contractInstance.numTotalLoans.call().then(function(numLoans) {
+      loanList = [];
+      $("#recent-loan-rows").empty();
+      var ccount = 0;
+      for(var i = 0; i < 10 && numLoans-1-i >= 0; i++) {
+        contractInstance.loanList(numLoans-1-i).then(function(el) {
+          $("#recent-loan-rows").append("<tr><td>" + (numLoans-1-(ccount++)) + "</td><td>" + el[0].valueOf() + "</td><td>" + el[1].valueOf() + "</td><td>" + Date(el[2].valueOf())  + "</td><td>" + el[3].valueOf() + "</td><tr>");
+        });
+      }
+    });
+  })
 }
 
 $( document ).ready(function() {
@@ -51,6 +54,12 @@ $( document ).ready(function() {
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://172.25.12.128:8545"));
   }
 
+  web3.eth.getAccounts(function(err, accs) {
+    account = accs[0];
+    $("h1").html("<h1> Hi! Loan Lender " + account +  "</h1>");
+  });
+
   CrowdBank.setProvider(web3.currentProvider);
   populateProposals();
+  populateRecentLoans();
 });

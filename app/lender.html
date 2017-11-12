@@ -12,7 +12,7 @@
 </head>
 <body class="container">
   <h1> Hi! Loan Lender </h1>
-  <div class="col-sm-7 margin-top-3">
+  <div class="col-sm-6 margin-top-3">
     <h2>List of Proposals Submitted: </h2>
     <div class="table-responsive">
       <table class="table table-bordered">
@@ -20,7 +20,7 @@
           <tr>
             <th>Lender</th>
             <th>LoanId</th>
-            <th>Loan State</th>
+            <th>Proposal State</th>
             <th>Rate</th>
             <th>Amount</th>
           </tr>
@@ -32,7 +32,29 @@
     <div class="container-fluid">
 
     </div>
-  </div> 
+  </div>
+  <div class="col-sm-6 margin-top-3">
+    <div class="row">
+      <h2>List of Recent Loans</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>LoanId</th>
+              <th>Borrower</th>
+              <th>Loan State</th>
+              <th>Due Date</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="recent-loan-rows">
+          </tbody>
+        </table>
+        </table>
+      </div>
+    </div>
+  </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
 <script src="lender.js"></script>
