@@ -23,8 +23,8 @@
       <a class="navbar-brand text-white" href="/">
         Crowd Bank
       </a>
-      <a class="navbar-brand navbar-right">
-        Proffer Block Chain Hackathon 2017
+      <a class="navbar-brand">
+        (Proffer Block Chain Hackathon 2017)
       </a>
     </nav>
 
@@ -46,12 +46,16 @@
                 <form>
                   <div class="form-group">
                     <label for="amount">Amount:</label>
-                    <input type="number" class="form-control" id="newloan-amount" name="amount">
+                    <input type="number" class="form-control" id="newloan-amount" name="amount" placeholder="Loan Amount">
                   </div>
                   <div class="form-group">
                     <label for="date">Due Date:</label>
                     <input type="date" class="form-control" id="newloan-date" name="date">
                   </div>
+                  <!--<div class="form-group">-->
+                  <!--  <label for="mortgage">Mortgage:</label>-->
+                  <!--  <input type="text" class="form-control" id="newloan-mortgage" name="mortgage" placeholder="Govt Verified Hash of your Mortgage">-->
+                  <!--</div>-->
                   <button type="submit" class="btn btn-default">Ask for Money</button>
                 </form>
               </div>
@@ -63,12 +67,12 @@
               <table id="loan-rows" class="table table-striped table-hover">
                 <thead>
                   <tr class="info">
+                    <th>Loan Id</th>
                     <th>Loan State</th>
                     <th>Due Date</th>
-                    <th>Amount</th>
-                    <th>Proposals</th>
+                    <th>Amount Asked</th>
+                    <th>No. of Proposals</th>
                     <th>Amount Collected</th>
-                    <th>Loan Id</th>
                     <th>Details</th>
                     <th>Action</th>
                   </tr>

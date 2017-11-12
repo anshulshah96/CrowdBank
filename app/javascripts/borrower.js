@@ -3,13 +3,14 @@
 
 // Import libraries we need.
 import { default as Web3} from 'web3';
-import { default as contract } from 'truffle-contract'
+import { default as contract } from 'truffle-contract';
 
-import bank_artifacts from '../../build/contracts/CrowdBank.json'
+import bank_artifacts from '../../build/contracts/CrowdBank.json';
 
 var CrowdBank = contract(bank_artifacts);
 var account;
 var wtoE;
+var GAS_AMOUNT = 90000000;
 
 var LOANSTATE = {
   0 : "ACCEPTING",
@@ -18,10 +19,10 @@ var LOANSTATE = {
   3 : "COMPLETION FAILED"
 }
 var LOANSTATECLASS = {
-  0 : "table-primary",
-  1 : "table-info",
-  2 : "table-success",
-  3 : "table-danger"
+  0 : "primary",
+  1 : "info",
+  2 : "success",
+  3 : "danger"
 }
 
 function LOANSTATEACTION(state,loanId)
@@ -52,6 +53,33 @@ function getLoanState() {
   });
 }
 
+function refreshPage() {
+  location.reload();
+}
+var getProposalClass = {
+  0 : "info",
+  1 : "success",
+  2 : "danger"
+}
+
+function getProposalAction(proposalState,proposalId)
+{
+  if(proposalState == 0)
+    return '<b><a onclick="acceptProposal('+proposalId+')">ACCEPT</a></b>';
+  else if(proposalState == 1)
+    return '<b>Accepted</b>';
+  else
+    return '<b>Repaid</b>';
+}
+
+window.acceptProposal = function(proposalId) {
+  CrowdBank.deployed().then(function(contractInstance) {
+    contractInstance.acceptProposal(proposalId,{gas: GAS_AMOUNT, from: account}).then(function(result) {
+      refreshPage();
+    });
+  });
+}
+
 window.showLoanDetails = function(loanId) {
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.loanList(loanId).then(function(result) {
@@ -62,17 +90,18 @@ window.showLoanDetails = function(loanId) {
       for(let i=0;i< proposalCount ;i++)
       {
         contractInstance.getProposalDetailsByLoanIdPosition.call(loanId, i).then(function(el) {
-          var newRowContent = '<tr>\
+          console.log(el);
+          var newRowContent = '<tr class="'+getProposalClass[el[0].valueOf()]+'">\
+            <td>'+(el[2].valueOf()/wtoE)+' eth</td>\
             <td>'+el[1].valueOf()+'</td>\
-            <td>'+el[2].valueOf()+'</td>\
-            <td>'+el[0].valueOf()+'</td>\
+            <td>'+getProposalAction(el[0].valueOf(),el[3].valueOf())+'</td>\
           </tr>';
           $("#loan-proposal-details tbody").prepend(newRowContent);
         });
       }
     });
     contractInstance.getRepayValue.call(loanId).then(function(result) {
-      console.log(result.valueOf());
+      $('#loan-repay-amount').html(result.valueOf()/wtoE + " eth");
     });
     $('#loanDetailsModal').modal('show');
   });
@@ -80,9 +109,9 @@ window.showLoanDetails = function(loanId) {
 
 window.lockLoan = function(loanId) {
   CrowdBank.deployed().then(function(contractInstance) {
-    contractInstance.lockLoan(loanId,{gas: 1400000, from: account}).then(function() {
+    contractInstance.lockLoan(loanId,{gas: GAS_AMOUNT, from: account}).then(function() {
       console.log("LOAN LOCKED SUCCESSFULLY");
-      window.href = '/borrower.html';
+      refreshPage();
     });
   });
 }
@@ -90,8 +119,11 @@ window.lockLoan = function(loanId) {
 window.repayLoan = function(loanId) {
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.getRepayValue.call(loanId).then(function(result){
-      contractInstance.repayLoan(loanId,{gas: 1400000, from: account, value : result}).then(function(){
+      var amount = parseInt(result.valueOf()) + parseInt(web3.toWei(1,'ether').valueOf());
+      console.log(amount);
+      contractInstance.repayLoan(loanId,{gas: GAS_AMOUNT, from: account, value : amount}).then(function(){
         console.log("REPAY DONE SUCCESSFULLY");
+        refreshPage();
       });
     });
   });
@@ -110,12 +142,12 @@ function showPastLoans() {
         {
           contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(el) {
             var newRowContent = '<tr class="'+LOANSTATECLASS[el[0].valueOf()]+'">\
-              <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
-              <td>'+Date(el[1].valueOf())+'</td>\
-              <td>'+el[2].valueOf()/wtoE+'</td>\
-              <td>'+el[3].valueOf()+'</td>\
-              <td>'+el[4].valueOf()+'</td>\
               <td>'+el[5].valueOf()+'</td>\
+              <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
+              <td>'+new Date(el[1].valueOf()*1000).toGMTString()+'</td>\
+              <td>'+el[2].valueOf()/wtoE+' eth</td>\
+              <td>'+el[3].valueOf()+'</td>\
+              <td>'+el[4].valueOf()/wtoE+' eth</td>\
               <td><button class="btn btn-default" onclick="showLoanDetails('+el[5].valueOf()+')">Details</button></td>\
               <td>'+LOANSTATEACTION(el[0].valueOf(),el[5].valueOf())+'</td>\
             </tr>';
@@ -138,9 +170,9 @@ function displayForm() {
 function newLoan(amount, date) {
   CrowdBank.deployed().then(function(contractInstance) {
     // contractInstance.defaultAccount = account;
-    contractInstance.newLoan(web3.toWei(amount,'ether'),date,{gas: 1400000, from: account}).then(function() {
+    contractInstance.newLoan(web3.toWei(amount,'ether'),date,{gas: GAS_AMOUNT, from: account}).then(function() {
       console.log("CREATED NEW LOAN");
-      window.href = '/borrower.html';
+      refreshPage();
     });
   });
 }
@@ -178,3 +210,12 @@ $( document ).ready(function() {
   showPastLoans();
   // $('#loan-rows').DataTable();
 });
+
+
+
+/*
+TO DO
+2. Repay Amount - Proposal Details
+3. Show Borrower Address in Proposal Details
+4. 
+*/

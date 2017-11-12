@@ -23,8 +23,8 @@
       <a class="navbar-brand text-white" href="/">
         Crowd Bank
       </a>
-      <a class="navbar-brand navbar-right">
-        Proffer Block Chain Hackathon 2017
+      <a class="navbar-brand">
+        (Proffer Block Chain Hackathon 2017)
       </a>
     </nav>
 
@@ -38,9 +38,9 @@
           <h5>Your Account Address : <span id="account-number"></span></h5>
           <h5>Your Account Balance : <span id="account-balance"></span>ETH</h5>
           <hr class="intro-divider">
-          <h4><b>Your List of Proposals</b></h4>
           <div class="row">
             <div class="col-sm-12">
+              <h4><b>Your List of Proposals</b></h4>
               <table class="table table-striped table-hover">
                 <thead>
                   <tr class="info">
@@ -55,7 +55,11 @@
                 </tbody>
               </table>
             </div>
+          </div>
+          <hr class="intro-divider">
+          <div class="row">
             <div class="col-sm-12">
+            <h4><b>Recent Loans Requests</b></h4>
               <table class="table table-striped table-hover">
                 <thead>
                   <tr class="info">
@@ -64,7 +68,9 @@
                     <th>Loan State</th>
                     <th>Due Date</th>
                     <th>Amount</th>
-                    <th>Take Action</th>
+                    <th>Proposed Amount</th>
+                    <th>Proposed Rate</th>
+                    <th>Propose</th>
                   </tr>
                 </thead>
                 <tbody id="recent-loan-rows">

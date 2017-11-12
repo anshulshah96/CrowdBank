@@ -79,8 +79,8 @@ contract CrowdBank {
         return lastLoanId;
     }
 
-    function revokeProposal(uint proposeId) {
-        if(msg.sender != proposalList[proposeId].lender) return;
+    function revokeMyProposal(uint id) {        
+        uint proposeId = lendMap[msg.sender][id];
         if(proposalList[proposeId].state != ProposalState.WAITING) return;
         uint loanId = proposalList[proposeId].loanId;
         if(loanList[loanId].state == LoanState.ACCEPTING) {
@@ -134,9 +134,9 @@ contract CrowdBank {
         return (obj.state, obj.dueDate, obj.amount, obj.proposalCount, obj.collected);
     }
 
-    function getProposalDetailsByLoanIdPosition(uint loanId, uint numI) constant returns(ProposalState, uint, uint) {
+    function getProposalDetailsByLoanIdPosition(uint loanId, uint numI) constant returns(ProposalState, uint, uint, uint, address) {
         Proposal obj = proposalList[loanList[loanId].proposal[numI]];
-        return (obj.state, obj.rate, obj.amount);
+        return (obj.state, obj.rate, obj.amount, loanList[loanId].proposal[numI],obj.lender);
     }
 
     function numTotalLoans() constant returns(uint) {
@@ -181,7 +181,7 @@ contract CrowdBank {
               uint original = proposalList[numI].amount;
               uint rate = proposalList[numI].rate;
               uint now = block.timestamp;
-              uint interest = (original*rate*(now - time));
+              uint interest = (original*rate*(now - time))/(365*24*60*60*100);
               finalamount += interest;
               finalamount += original;
             }
@@ -197,8 +197,9 @@ contract CrowdBank {
       uint toBePaid = getRepayValue(loanId);
       uint time = loanList[loanId].startDate;
       uint paid = msg.value;
-      if(paid == toBePaid)
+      if(paid >= toBePaid)
       {
+        uint remain = paid - toBePaid;
         loanList[loanId].state = LoanState.SUCCESSFUL;
         for(uint i = 0; i < loanList[loanId].proposalCount; i++)
         {
@@ -207,25 +208,34 @@ contract CrowdBank {
           {
             uint original = proposalList[numI].amount;
             uint rate = proposalList[numI].rate;
-            uint interest = (original*rate*(now - time));
+            uint interest = (original*rate*(now - time))/(365*24*60*60*100);
             uint finalamount = interest + original;
             proposalList[numI].lender.transfer(finalamount);
             proposalList[numI].state = ProposalState.REPAID;
           }
         }
+        msg.sender.transfer(remain);
       }
       else
-        return;
+      {
+        msg.sender.transfer(paid);
+      }
     }
     
-    function takeActionOnProposal(uint proposeId)
+    function acceptProposal(uint proposeId)
     {
         uint loanId = getActiveLoanId(msg.sender); 
         if(loanId == (2**64 - 1)) return;
         Proposal pObj = proposalList[proposeId];
+        if(pObj.state != ProposalState.WAITING) return;
+
         Loan lObj = loanList[loanId];
         if(lObj.state != LoanState.ACCEPTING) return;
-        if(pObj.state != ProposalState.WAITING) return;
-        proposalList[proposeId].state = ProposalState.ACCEPTED;
+
+        if(lObj.collected + pObj.amount <= lObj.amount)
+        {
+          loanList[loanId].collected += pObj.amount;
+          proposalList[proposeId].state = ProposalState.ACCEPTED;
+        }
     }
 }

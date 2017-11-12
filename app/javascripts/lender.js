@@ -17,7 +17,7 @@ var wtoE;
 var PROPOSALSTATE = {
   0 : "WAITING",
   1 : "ACCEPTED",
-  2 : "REJECTED"
+  2 : "REPAID"
 }
 var LOANSTATE = {
   0 : "ACCEPTING",
@@ -33,15 +33,12 @@ var LOANSTATECLASS = {
 }
 
 window.revokeProposal = function(id) {
-  console.log(id);
   CrowdBank.deployed().then(function(contractInstance) {
-    contractInstance.lendMap(account, id).then(function(proposalId) {
-      console.log(proposalId);
-      contractInstance.revokeProposal(proposalId).then(function(transaction) {
-        console.log("proposalId " + proposalId + " was tried to revoked");
-        console.log(transaction);
-        refreshPage();
-      });
+    console.log(id);
+    contractInstance.revokeMyProposal(id, {from: account, gas:2000000}).then(function(transaction) {
+      console.log("proposalId " + id + " was tried to revoked");
+      console.log(transaction);
+      refreshPage();
     });
   });
 }
@@ -54,9 +51,15 @@ function populateProposals() {
       var curpos = 0;
       for(var i = 0; i < proposalLength; i++) {
         contractInstance.getProposalAtPosFor.call(account, i).then(function(el) {
-          var buttonHTML = "<button onclick='revokeProposal("+(curpos++)+")'>\
-            x\
-            </button>";
+          var buttonHTML;
+          if(el[2].valueOf() == 0) {
+            buttonHTML = "<button class='btn btn-danger' onclick='revokeProposal("+(curpos++)+")'>\
+              x\
+              </button>";
+          }
+          else {
+            buttonHTML = "--";
+          }
           $("#proposal-rows").append("<tr id='proposal"+i+"'>\
             <td>" + el[1].valueOf() + "</td>\
             <td>" + PROPOSALSTATE[el[2].valueOf()]  + "</td>\
@@ -91,17 +94,18 @@ function populateRecentLoans() {
       for(var i = 0; i < 10 && numLoans-1-i >= 0; i++) {
         contractInstance.loanList(numLoans-1-i).then(function(el) {
           var loanId = (numLoans-1-(ccount));
-          var actionHTML = 
-            "<input type='number' id='lendinput"+loanId+"'></input>\
-            <input type='number' id='lendrate"+loanId+"'></input>\
-            <button onclick='proposeLend("+loanId+")'>Do</button>";
+          var amountHTML = "<input type='number' id='lendinput"+loanId+"'></input>";
+          var rateHTML = "<input type='number' id='lendrate"+loanId+"'></input>";
+          var btnHTML = "<button class='btn btn-success' onclick='proposeLend("+loanId+")'>✔</button>";
           $("#recent-loan-rows").append("<tr class='"+LOANSTATECLASS[el[0].valueOf()]+"'>\
             <td>" + (numLoans-1-(ccount++)) + "</td>\
             <td>" + el[0].valueOf() + "</td>\
             <td>" + LOANSTATE[el[1].valueOf()] + "</td>\
             <td>" + Date(el[2].valueOf())  + "</td>\
             <td>" + el[3].valueOf()/wtoE + "</td>\
-            <td>" + actionHTML  + "</td>\
+            <td>" + amountHTML  + "</td>\
+            <td>" + rateHTML  + "</td>\
+            <td>" + btnHTML  + "</td>\
             <tr>");
         });
       }
@@ -110,6 +114,12 @@ function populateRecentLoans() {
 }
 
 function refreshPage() {
+  web3.eth.getAccounts(function(err, accs) {
+    wtoE = web3.toWei(1,'ether');
+    account = accs[0];
+    $('#account-number').html(account);
+    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/wtoE);
+  });
   populateProposals();
   populateRecentLoans();
 }
@@ -124,13 +134,6 @@ $( document ).ready(function() {
     // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://172.25.12.128:8545"));
   }
-
-  web3.eth.getAccounts(function(err, accs) {
-    wtoE = web3.toWei(1,'ether');
-    account = accs[0];
-    $('#account-number').html(account);
-    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/wtoE);
-  });
 
   CrowdBank.setProvider(web3.currentProvider);
   refreshPage();
