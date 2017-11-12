@@ -11,12 +11,12 @@ contract('CrowdBank', function(accounts) {
       instanceObj = instance;
       return instance.newLoan(100, 106000, {from:account_one});
     }).then(function(transaction) {
-      return instanceObj.getLoanDetailsById.call(0);
+      return instanceObj.loanList(0);
     }).then(function(response) {
       console.log(response);
-      assert.equal(response[0].valueOf(), 0,      "state does not match");
-      assert.equal(response[1].valueOf(), 106000, "dueDate does not match");
-      assert.equal(response[2].valueOf(), 100,   "amount does not match");
+      assert.equal(response[1].valueOf(), 0,      "state does not match");
+      assert.equal(response[2].valueOf(), 106000, "dueDate does not match");
+      assert.equal(response[3].valueOf(), 100,   "amount does not match");
       return instanceObj.newProposal(0, 10, {value: 1, from: account_two});
     }).then(function(transaction) {
       return instanceObj.totalProposalsBy.call(account_two);
