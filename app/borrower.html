@@ -80,9 +80,43 @@
           </div>
         </div>
       </div>
+      
+      <!-- SHOW LOAN DETAILS MODAL -->
+      <div class="modal fade" id="loanDetailsModal" tabindex="-1" role="dialog" aria-labelledby="loanDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" style="display:inline-block;"><b>Proposal Details</b></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Proposal Count : <span id="loan-proposal-count"></span></p>
+              <table id="loan-proposal-details" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <td>Amount</td>
+                    <td>Rate of Interest</td>
+                    <td>Take Action</td>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+              <p>Repay Amount : <span id="loan-repay-amount"></span></p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </header>
   </body>
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script src="borrower.js"></script>
 </html>

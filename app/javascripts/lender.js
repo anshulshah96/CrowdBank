@@ -32,20 +32,37 @@ var LOANSTATECLASS = {
   3 : "danger"
 }
 
+window.revokeProposal = function(id) {
+  console.log(id);
+  CrowdBank.deployed().then(function(contractInstance) {
+    contractInstance.lendMap(account, id).then(function(proposalId) {
+      console.log(proposalId);
+      contractInstance.revokeProposal(proposalId).then(function(transaction) {
+        console.log("proposalId " + proposalId + " was tried to revoked");
+        console.log(transaction);
+        refreshPage();
+      });
+    });
+  });
+}
 
 function populateProposals() {
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.totalProposalsBy.call(account).then(function(proposalLength) {
       proposals = [];
       $("#proposal-rows").empty();
+      var curpos = 0;
       for(var i = 0; i < proposalLength; i++) {
         contractInstance.getProposalAtPosFor.call(account, i).then(function(el) {
-          $("#proposal-rows").append("<tr>\
-            <td>" + el[0].valueOf() + "</td>\
+          var buttonHTML = "<button onclick='revokeProposal("+(curpos++)+")'>\
+            x\
+            </button>";
+          $("#proposal-rows").append("<tr id='proposal"+i+"'>\
             <td>" + el[1].valueOf() + "</td>\
             <td>" + PROPOSALSTATE[el[2].valueOf()]  + "</td>\
             <td>" + el[3].valueOf() + "</td>\
             <td>" + el[4].valueOf()/wtoE + "</td>\
+            <td>" + buttonHTML + "</td>\
             </tr>");
         });
       }
@@ -53,16 +70,16 @@ function populateProposals() {
   });
 }
 
-window.calli = function(id) {
+window.proposeLend = function(id) {
   var amount = $('#lendinput'+id).val();
   var rate = $('#lendrate'+id).val();
   console.log("Lending " + amount + " Ether to LoanId " + id);
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.newProposal(id, rate, {value: web3.toWei(amount,'ether'), from: account, gas: 2000000}).then(function(transaction) {
         console.log(transaction);
+        refreshPage();
     });
   })
-
 }
 
 function populateRecentLoans() {
@@ -77,7 +94,7 @@ function populateRecentLoans() {
           var actionHTML = 
             "<input type='number' id='lendinput"+loanId+"'></input>\
             <input type='number' id='lendrate"+loanId+"'></input>\
-            <button onclick='calli("+loanId+")'>Do</button>";
+            <button onclick='proposeLend("+loanId+")'>Do</button>";
           $("#recent-loan-rows").append("<tr class='"+LOANSTATECLASS[el[0].valueOf()]+"'>\
             <td>" + (numLoans-1-(ccount++)) + "</td>\
             <td>" + el[0].valueOf() + "</td>\
@@ -90,6 +107,11 @@ function populateRecentLoans() {
       }
     });
   })
+}
+
+function refreshPage() {
+  populateProposals();
+  populateRecentLoans();
 }
 
 $( document ).ready(function() {
@@ -111,6 +133,5 @@ $( document ).ready(function() {
   });
 
   CrowdBank.setProvider(web3.currentProvider);
-  populateProposals();
-  populateRecentLoans();
+  refreshPage();
 });

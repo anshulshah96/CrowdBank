@@ -18,17 +18,27 @@ var LOANSTATE = {
   3 : "COMPLETION FAILED"
 }
 var LOANSTATECLASS = {
-  0 : "primary",
-  1 : "info",
-  2 : "success",
-  3 : "danger"
+  0 : "table-primary",
+  1 : "table-info",
+  2 : "table-success",
+  3 : "table-danger"
 }
-var LOANSTATEACTION = {
-  0 : '<button class="btn btn-danger">LOCK</button>',
-  1 : '<button class="btn btn-success">REPAY</button>',
-  2 : '-',
-  3 : '-'
+
+function LOANSTATEACTION(state,loanId)
+{
+  if(state == 0)
+  {
+    return '<button class="btn btn-danger" onclick="lockLoan('+loanId+')">LOCK</button>';
+  }
+  else if(state == 1)
+  {
+    return '<button class="btn btn-success" onclick="repayLoan('+loanId+')">REPAY</button>';
+  }
+  else
+    return '-';
 }
+
+var loanData = [];
 
 function getLoanState() {
   CrowdBank.deployed().then(function(contractInstance) {
@@ -42,28 +52,72 @@ function getLoanState() {
   });
 }
 
+window.showLoanDetails = function(loanId) {
+  CrowdBank.deployed().then(function(contractInstance) {
+    contractInstance.loanList(loanId).then(function(result) {
+      console.log(result);
+      var proposalCount = (result[4].valueOf());
+      $('#loan-proposal-count').html(proposalCount);
+      $("#loan-proposal-details tbody").empty();
+      for(let i=0;i< proposalCount ;i++)
+      {
+        contractInstance.getProposalDetailsByLoanIdPosition.call(loanId, i).then(function(el) {
+          var newRowContent = '<tr>\
+            <td>'+el[1].valueOf()+'</td>\
+            <td>'+el[2].valueOf()+'</td>\
+            <td>'+el[0].valueOf()+'</td>\
+          </tr>';
+          $("#loan-proposal-details tbody").prepend(newRowContent);
+        });
+      }
+    });
+    contractInstance.getRepayValue.call(loanId).then(function(result) {
+      console.log(result.valueOf());
+    });
+    $('#loanDetailsModal').modal('show');
+  });
+}
+
+window.lockLoan = function(loanId) {
+  CrowdBank.deployed().then(function(contractInstance) {
+    contractInstance.lockLoan(loanId,{gas: 1400000, from: account}).then(function() {
+      console.log("LOAN LOCKED SUCCESSFULLY");
+      window.href = '/borrower.html';
+    });
+  });
+}
+
+window.repayLoan = function(loanId) {
+  CrowdBank.deployed().then(function(contractInstance) {
+    contractInstance.getRepayValue.call(loanId).then(function(result){
+      contractInstance.repayLoan(loanId,{gas: 1400000, from: account, value : result}).then(function(){
+        console.log("REPAY DONE SUCCESSFULLY");
+      });
+    });
+  });
+}
+
 function showPastLoans() {
   CrowdBank.deployed().then(function(contractInstance) {
     console.log("CONTRACT : ",contractInstance);
     console.log(account);
     contractInstance.totalLoansBy.call(account).then(function(loanCount) {
       console.log("GOT NUMBER OF LOANS : ",loanCount.valueOf());
-      if(loanCount.valueOf() != 0)
+      if(loanCount.valueOf() !== 0)
       {
         getLoanState();
         for(let i=0;i< loanCount.valueOf();i++)
         {
           contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(el) {
-            console.log(el);
             var newRowContent = '<tr class="'+LOANSTATECLASS[el[0].valueOf()]+'">\
               <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
               <td>'+Date(el[1].valueOf())+'</td>\
-              <td>'+el[2].valueOf()+'</td>\
+              <td>'+el[2].valueOf()/wtoE+'</td>\
               <td>'+el[3].valueOf()+'</td>\
               <td>'+el[4].valueOf()+'</td>\
               <td>'+el[5].valueOf()+'</td>\
-              <td><button>Details</button></td>\
-              <td>'+LOANSTATEACTION[el[0].valueOf()]+'</td>\
+              <td><button class="btn btn-default" onclick="showLoanDetails('+el[5].valueOf()+')">Details</button></td>\
+              <td>'+LOANSTATEACTION(el[0].valueOf(),el[5].valueOf())+'</td>\
             </tr>';
             $("#loan-rows tbody").prepend(newRowContent);
           });
@@ -73,8 +127,8 @@ function showPastLoans() {
       {
         displayForm();
       }
-    });
-  });
+   });
+  });  
 }
 
 function displayForm() {
@@ -86,6 +140,7 @@ function newLoan(amount, date) {
     // contractInstance.defaultAccount = account;
     contractInstance.newLoan(web3.toWei(amount,'ether'),date,{gas: 1400000, from: account}).then(function() {
       console.log("CREATED NEW LOAN");
+      window.href = '/borrower.html';
     });
   });
 }
@@ -114,17 +169,10 @@ $( document ).ready(function() {
     newLoan(amount,date);
   });
 
-  $('#loan-rows tbody').on( 'click', 'button', function () {
-    var table = $('#loan-rows').DataTable();
-    var data = table.row( $(this).parents('tr') ).data();
-    var loanId = data[5];
-    console.log(loanId);
-    CrowdBank.deployed().then(function(contractInstance) {
-      contractInstance.getLoanDetailsById.call(loanId).then(function(data) {
-        console.log(data);
-      });
-    });
-  });
+  // $('#loan-rows tbody').on( 'click', 'button', function (event) {
+  //   console.log(event.target);
+  //   console.log(event);
+  // });
 
   CrowdBank.setProvider(web3.currentProvider);
   showPastLoans();
