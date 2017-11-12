@@ -16,9 +16,16 @@ var LOANSTATE = {
   2 : "COMPLETED SUCCESSFUL",
   3 : "COMPLETION FAILED"
 }
+var LOANSTATECLASS = {
+  0 : "primary",
+  1 : "info",
+  2 : "success",
+  3 : "danger"
+}
 
 function showPastLoans() {
   CrowdBank.deployed().then(function(contractInstance) {
+    console.log("CONTRACT : ",contractInstance);
     contractInstance.totalLoansBy.call(account).then(function(loanCount) {
       console.log("GOT NUMBER OF LOANS : ",loanCount.valueOf());
       if(loanCount.valueOf() != 0)
@@ -34,32 +41,24 @@ function showPastLoans() {
       {
         contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(el) {
           console.log(el);
-          var table = $('#loan-rows').DataTable();
-          var rowNode = table.row.add([LOANSTATE[el[0].valueOf()],Date(el[1].valueOf()),el[2].valueOf(),el[3].valueOf(),el[4].valueOf(),el[5].valueOf(),"<button>Details!</button>"]).draw().node();
+          var newRowContent = '<tr class="'+LOANSTATECLASS[el[0].valueOf()]+'">\
+            <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
+            <td>'+Date(el[1].valueOf())+'</td>\
+            <td>'+el[2].valueOf()+'</td>\
+            <td>'+el[3].valueOf()+'</td>\
+            <td>'+el[4].valueOf()+'</td>\
+            <td>'+el[5].valueOf()+'</td>\
+          </tr>';
+          $("#loan-rows tbody").append(newRowContent);
         });
       }
     });
   });
-}
 
+}
 function displayForm() {
   document.getElementById('newloan-form').style.display = 'block';
 }
-
-// function getLoanState() {
-//   CrowdBank.deployed().then(function(contractInstance) {
-//     contractInstance.getLastLoanState.call(account).then(function(LoanState) {
-//       if(LoanState == 0)
-//       {
-//         displayForm();
-//       }
-//       else
-//       {
-//         getLastLoanDetails();
-//       }
-//     });
-//   });
-// }
 
 function newLoan(amount, date) {
   CrowdBank.deployed().then(function(contractInstance) {
@@ -81,9 +80,10 @@ $( document ).ready(function() {
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://172.25.12.128:8545"));
   }
   web3.eth.getAccounts(function(err, accs) {
-    account = accs[3];
+    account = accs[0];
+    $('#account-number').html(account);
+    $('#account-balance').html(web3.eth.getBalance(account).valueOf());
   });
-
 
   document.getElementById('newloan-form').addEventListener('submit', function(evt){
     evt.preventDefault();
@@ -105,6 +105,6 @@ $( document ).ready(function() {
   });
 
   CrowdBank.setProvider(web3.currentProvider);
-  $('#loan-rows').DataTable();
   showPastLoans();
+  // $('#loan-rows').DataTable();
 });

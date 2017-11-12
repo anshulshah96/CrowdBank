@@ -1,53 +1,85 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Borrower Page</title>
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
-  <style type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></style>
-</head>
-<body class="container">
-  <h1> Hi! Loan Borrower </h1>
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-12">
-        <table id="loan-rows">
-          <thead>
-            <tr>
-              <th>Loan State</th>
-              <th>Due Date</th>
-              <th>Amount</th>
-              <th>Proposals</th>
-              <th>Amount Collected</th>
-              <th>Loan Id</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-          </tbody>
-        </table>
-      </div>
-      <div class="col-sm-12">
-        <div class="alert alert-info" id="newloan-form" style="display:none;">
-          <h4 class="alert-heading"><b>No Currently Active Loan! Ask for one here.</b></h4>
-          <form>
-            <div class="form-group">
-              <label for="amount">Amount:</label>
-              <input type="number" class="form-control" id="newloan-amount" name="amount">
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Borrower - Crowd Bank</title>
+    <!-- Bootstrap core CSS -->
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <!-- Custom fonts for this template -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-inverse bg-inverse">
+      <a class="navbar-brand text-white" href="/">
+        Crowd Bank
+      </a>
+      <a class="navbar-brand navbar-right">
+        Proffer Block Chain Hackathon 2017
+      </a>
+    </nav>
+
+    <!-- Header -->
+    <header class="intro-header">
+      <div class="container">
+        <div class="intro-message">
+          <h1>Hi! Borrower</h1>
+          <h4>Welcome to Crowd Bank</h4>
+          <hr class="intro-divider">
+          <h5>Your Account Address : <span id="account-number"></span></h5>
+          <h5>Your Account Balance : <span id="account-balance"></span> ethereum</h5>
+          <hr class="intro-divider">
+          <h4><b>Your Past Loan Details</b></h4>
+          <div class="row">
+            <div class="col-sm-12">
+              <table id="loan-rows" class="table table-striped table-hover">
+                <thead>
+                  <tr class="info">
+                    <th>Loan State</th>
+                    <th>Due Date</th>
+                    <th>Amount</th>
+                    <th>Proposals</th>
+                    <th>Amount Collected</th>
+                    <th>Loan Id</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
             </div>
-            <div class="form-group">
-              <label for="date">Due Date:</label>
-              <input type="date" class="form-control" id="newloan-date" name="date">
+
+            <div class="col-sm-12">
+              <div class="alert alert-info" id="newloan-form" style="display:none;">
+                <h4 class="alert-heading"><b>No Currently Active Loan! Ask for one here.</b></h4>
+                <form>
+                  <div class="form-group">
+                    <label for="amount">Amount:</label>
+                    <input type="number" class="form-control" id="newloan-amount" name="amount">
+                  </div>
+                  <div class="form-group">
+                    <label for="date">Due Date:</label>
+                    <input type="date" class="form-control" id="newloan-date" name="date">
+                  </div>
+                  <button type="submit" class="btn btn-default">Ask for Money</button>
+                </form>
+              </div>
             </div>
-            <button type="submit" class="btn btn-default">Ask for Money</button>
-          </form>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</body>
+    </header>
+  </body>
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="borrower.js"></script>
 </html>
