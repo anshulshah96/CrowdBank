@@ -1,11 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MetaCoin - Truffle Webpack Demo w/ Frontend</title>
+  <title>Borrower Page</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-  <script src="./borrower.js"></script>
+   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+  <style type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></style>
 </head>
-<body>
-  <h1>Bhikariyo ka Home Page</h1>
+<body class="container">
+  <h1> Hi! Loan Borrower </h1>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <table id="loan-rows">
+          <thead>
+            <tr>
+              <th>Loan State</th>
+              <th>Due Date</th>
+              <th>Amount</th>
+              <th>Proposals</th>
+              <th>Amount Collected</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="col-sm-6">
+        <div class="alert alert-info" id="newloan-form" style="display:none;">
+          <h4 class="alert-heading"><b>No Currently Active Loan! Ask for one here.</b></h4>
+          <form>
+            <div class="form-group">
+              <label for="amount">Amount:</label>
+              <input type="number" class="form-control" id="newloan-amount" name="amount">
+            </div>
+            <div class="form-group">
+              <label for="date">Due Date:</label>
+              <input type="date" class="form-control" id="newloan-date" name="date">
+            </div>
+            <button type="submit" class="btn btn-default">Ask for Money</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="borrower.js"></script>
 </html>
