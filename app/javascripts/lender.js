@@ -14,6 +14,25 @@ var account;
 let loanList = [];
 var wtoE;
 
+var PROPOSALSTATE = {
+  0 : "WAITING",
+  1 : "ACCEPTED",
+  2 : "REJECTED"
+}
+var LOANSTATE = {
+  0 : "ACCEPTING",
+  1 : "LOCKED",
+  2 : "COMPLETED SUCCESSFUL",
+  3 : "COMPLETION FAILED"
+}
+var LOANSTATECLASS = {
+  0 : "primary",
+  1 : "info",
+  2 : "success",
+  3 : "danger"
+}
+
+
 function populateProposals() {
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.totalProposalsBy.call(account).then(function(proposalLength) {
@@ -24,7 +43,7 @@ function populateProposals() {
           $("#proposal-rows").append("<tr>\
             <td>" + el[0].valueOf() + "</td>\
             <td>" + el[1].valueOf() + "</td>\
-            <td>" + el[2].valueOf()  + "</td>\
+            <td>" + PROPOSALSTATE[el[2].valueOf()]  + "</td>\
             <td>" + el[3].valueOf() + "</td>\
             <td>" + el[4].valueOf()/wtoE + "</td>\
             </tr>");
@@ -59,10 +78,10 @@ function populateRecentLoans() {
             "<input type='number' id='lendinput"+loanId+"'></input>\
             <input type='number' id='lendrate"+loanId+"'></input>\
             <button onclick='calli("+loanId+")'>Do</button>";
-          $("#recent-loan-rows").append("<tr>\
+          $("#recent-loan-rows").append("<tr class='"+LOANSTATECLASS[el[0].valueOf()]+"'>\
             <td>" + (numLoans-1-(ccount++)) + "</td>\
             <td>" + el[0].valueOf() + "</td>\
-            <td>" + el[1].valueOf() + "</td>\
+            <td>" + LOANSTATE[el[1].valueOf()] + "</td>\
             <td>" + Date(el[2].valueOf())  + "</td>\
             <td>" + el[3].valueOf()/wtoE + "</td>\
             <td>" + actionHTML  + "</td>\
