@@ -1,4 +1,4 @@
-LoanDe-centralised
+CrowdBank
 =========================
 ⚙️ Peer to Peer Loan System implemented on Ethereum Smart Contracts
 
@@ -6,6 +6,7 @@ _Entry for Proffer's GENERATION BLOCKCHAIN Hackathon at IIT Delhi_
 
   * [Problem Statement](#problem-statement)
   * [Solution Abstract](#solution-abstract)
+  * [Demo Video](https://www.youtube.com/watch?v=2gzZemUs150)
   * [System Architecture](#system-architecture)
   * [Setup](#setup)
   * [License](#license)
@@ -58,7 +59,7 @@ License
 
 [MIT License](https://anshul.mit-license.org/)
 
-The following people have been the contributors for the project:
+The following people have been the contributors for the project. (Go star their repos :p)
  * [Anshul Shah](https://github.com/anshulshah96) 
  * [Nikhil Sheoran](https://github.com/nikhil96sher)
  * [Suraj Gupta](https://github.com/surajgupta97)
