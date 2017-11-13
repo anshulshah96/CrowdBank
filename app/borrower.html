@@ -52,9 +52,14 @@
                     <label for="date">Due Date:</label>
                     <input type="date" class="form-control" id="newloan-date" name="date">
                   </div>
+
                   <div class="form-group">
-                    <label for="mortgage">Your Mortgage Address:</label>
-                    <input type="text" class="form-control" id="newloan-mortgage" name="mortgage" placeholder="Govt Verified Hash of your Mortgage">
+                      <label class="control-label">Choose Mortgage</label>
+                      <div class="selectContainer">
+                          <select name="mortgage" id="newloan-mortgage" class="form-control">
+<!--                               <option value=""></option> -->
+                          </select>
+                      </div>
                   </div>
                   <button type="submit" class="btn btn-default">Ask for Money</button>
                 </form>

@@ -13,14 +13,6 @@ var wtoE;
 var GAS_AMOUNT = 90000000;
 var BASE_URL = 'https://sh3r.tech/files/';
 var md5 = require('md5');
-function getHashFromUrl() {
-  var url = location.href;
-  if(url.indexOf('?') == -1)
-    return;
-  var hash = url.split('?')[1].split('&')[0].split('=')[1]
-  $('#file-hash').val(hash);
-  verifyData();
-}
 
 window.verifyData = function() {
   var hash = $('#file-hash').val();
@@ -56,6 +48,16 @@ window.addData = function(data) {
   });  
 }
 
+//For testing purpose only
+function getHashFromUrl() {
+  var url = location.href;
+  if(url.indexOf('?') == -1)
+    return;
+  var hash = url.split('?')[1].split('&')[0].split('=')[1]
+  $('#file-hash').val(hash);
+  verifyData();
+}
+
 $( document ).ready(function() {
   if (typeof web3 !== 'undefined') {
     console.warn("Using web3 detected from external source. If you find that your accounts don't appear or you have 0 MetaCoin, ensure you've configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask")
@@ -67,7 +69,7 @@ $( document ).ready(function() {
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
   web3.eth.getAccounts(function(err, accs) {
-    account = accs[1];
+    account = accs[0];
     wtoE = web3.toWei(1,'ether');
   });
 

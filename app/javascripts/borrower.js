@@ -6,8 +6,10 @@ import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract';
 
 import bank_artifacts from '../../build/contracts/CrowdBank.json';
+import bank_artifacts2 from '../../build/contracts/Mortgage.json';
 
 var CrowdBank = contract(bank_artifacts);
+var Mortgage = contract(bank_artifacts2);
 var account;
 var wtoE;
 var GAS_AMOUNT = 90000000;
@@ -84,6 +86,18 @@ window.showLoanDetails = function(loanId) {
   CrowdBank.deployed().then(function(contractInstance) {
     contractInstance.loanList(loanId).then(function(result) {
       console.log(result);
+      if(result[1].valueOf() == 1)
+      {
+        contractInstance.getRepayValue.call(loanId).then(function(result) {
+          $('#loan-repay-amount').html(result.valueOf()/wtoE + " eth");
+        });        
+      }
+      else
+      {
+        contractInstance.getRepayValue.call(loanId).then(function(result) {
+          $('#loan-repay-amount').html("-");
+        });        
+      }
       var proposalCount = (result[4].valueOf());
       $('#loan-proposal-count').html(proposalCount);
       $("#loan-proposal-details tbody").empty();
@@ -99,9 +113,6 @@ window.showLoanDetails = function(loanId) {
           $("#loan-proposal-details tbody").prepend(newRowContent);
         });
       }
-    });
-    contractInstance.getRepayValue.call(loanId).then(function(result) {
-      $('#loan-repay-amount').html(result.valueOf()/wtoE + " eth");
     });
     $('#loanDetailsModal').modal('show');
   });
@@ -165,7 +176,26 @@ function showPastLoans() {
   });  
 }
 
+function getMortgageDetails() {
+  Mortgage.deployed().then(function(contractInstance) {
+
+    contractInstance.getMortgageCount.call(account).then(function(result) {
+      var count = result.valueOf();
+      console.log("MORTGAGE COUNT : ",count);
+      for(let i=0;i<count;i++)
+      {
+        contractInstance.mortgageMap(account,i).then(function(output) {
+          var mortgage = web3.toUtf8(output.valueOf());
+          var newOption = '<option value="'+mortgage+'">'+mortgage+'</option>';
+          $('#newloan-mortgage').append(newOption);
+        });
+      }
+    });
+  });
+}
+
 function displayForm() {
+  getMortgageDetails();
   document.getElementById('newloan-form').style.display = 'block';
 }
 
@@ -188,13 +218,7 @@ $( document ).ready(function() {
     // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
-  web3.eth.getAccounts(function(err, accs) {
-    account = accs[0];
-    wtoE = web3.toWei(1,'ether');
-    $('#account-number').html(account);
-    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/web3.toWei(1,'ether'));
-  });
-  
+
   web3.eth.getAccounts(function(err, accs) {
     wtoE = web3.toWei(1,'ether');
     account = accs[0];
@@ -220,7 +244,7 @@ $( document ).ready(function() {
   //   console.log(event.target);
   //   console.log(event);
   // });
-
+  Mortgage.setProvider(web3.currentProvider);
   CrowdBank.setProvider(web3.currentProvider);
   showPastLoans();
   // $('#loan-rows').DataTable();
