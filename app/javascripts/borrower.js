@@ -219,5 +219,5 @@ $( document ).ready(function() {
 TO DO
 2. Repay Amount - Proposal Details
 3. Show Borrower Address in Proposal Details
-4. 
+4. Write about convincing people whom banks do not trust
 */
