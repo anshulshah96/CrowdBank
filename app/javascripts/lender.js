@@ -127,12 +127,28 @@ function populateRecentLoans() {
   })
 }
 
+function getBalance (address) {
+  return web3.eth.getBalance(address, function (error, result) {
+    if (!error) {
+      console.log(result.toNumber());
+    } else {
+      console.error(error);
+    }
+  })
+}
+
 function refreshPage() {
   web3.eth.getAccounts(function(err, accs) {
     wtoE = web3.toWei(1,'ether');
     account = accs[0];
     $('#account-number').html(account);
-    $('#account-balance').html(web3.eth.getBalance(account).valueOf()/wtoE);
+    web3.eth.getBalance(account, function (error, result) {
+      if (!error) {
+        $('#account-balance').html(result.toNumber()/wtoE);
+      } else {
+        console.error(error);
+      }
+    });
   });
   populateProposals();
   populateRecentLoans();
@@ -144,9 +160,9 @@ $( document ).ready(function() {
     // Use Mist/MetaMask's provider
     window.web3 = new Web3(web3.currentProvider);
   } else {
-    console.warn("No web3 detected. Falling back to http://172.25.12.128:8545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
+    console.warn("No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
     // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    window.web3 = new Web3(new Web3.providers.HttpProvider("http://172.25.12.128:8545"));
+    window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
 
   CrowdBank.setProvider(web3.currentProvider);
