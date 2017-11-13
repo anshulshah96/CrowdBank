@@ -5,7 +5,8 @@ module.exports = {
   entry: {
     app: './app/javascripts/app.js',
     borrower: './app/javascripts/borrower.js',
-    lender: './app/javascripts/lender.js'
+    lender: './app/javascripts/lender.js',
+    verify: './app/javascripts/verify.js',
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -16,7 +17,8 @@ module.exports = {
     new CopyWebpackPlugin([
       { from: './app/index.html', to: "index.html" },
       { from: './app/borrower.html', to: "borrower.html" },
-      { from: './app/lender.html', to: "lender.html" }
+      { from: './app/lender.html', to: "lender.html" },
+      { from: './app/verify.html', to: "verify.html" }
     ])
   ],
   module: {
@@ -38,5 +40,10 @@ module.exports = {
         }
       }
     ]
+  },
+
+  devServer: {
+    compress: true,
+    disableHostCheck: true
   }
 }

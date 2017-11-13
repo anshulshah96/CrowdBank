@@ -141,15 +141,17 @@ function showPastLoans() {
         for(let i=0;i< loanCount.valueOf();i++)
         {
           contractInstance.getLoanDetailsByAddressPosition.call(account, i).then(function(el) {
+            console.log(el[5].valueOf());
+            console.log(el[5]);
             var newRowContent = '<tr class="'+LOANSTATECLASS[el[0].valueOf()]+'">\
-              <td>'+el[5].valueOf()+'</td>\
+              <td>'+el[4].valueOf()+'</td>\
               <td>'+LOANSTATE[el[0].valueOf()]+'</td>\
-              <td>'+new Date(el[1].valueOf()*1000).toGMTString()+'</td>\
+              <td>'+new Date(el[1].valueOf()*1000).toDateString()+'</td>\
               <td>'+el[2].valueOf()/wtoE+' eth</td>\
-              <td>'+el[3].valueOf()+'</td>\
-              <td>'+el[4].valueOf()/wtoE+' eth</td>\
-              <td><button class="btn btn-default" onclick="showLoanDetails('+el[5].valueOf()+')">Details</button></td>\
-              <td>'+LOANSTATEACTION(el[0].valueOf(),el[5].valueOf())+'</td>\
+              <td><a target="_blank" href="http://mortgage.crowdbank.gov.in:8080/verify.html?hash='+web3.toUtf8(el[5].valueOf())+'">Link</a></td>\
+              <td>'+el[3].valueOf()/wtoE+' eth</td>\
+              <td><button class="btn btn-default" onclick="showLoanDetails('+el[4].valueOf()+')">Details</button></td>\
+              <td>'+LOANSTATEACTION(el[0].valueOf(),el[4].valueOf())+'</td>\
             </tr>';
             $("#loan-rows tbody").prepend(newRowContent);
           });
@@ -167,11 +169,10 @@ function displayForm() {
   document.getElementById('newloan-form').style.display = 'block';
 }
 
-function newLoan(amount, date) {
+function newLoan(amount, date, mortgage) {
   CrowdBank.deployed().then(function(contractInstance) {
     // contractInstance.defaultAccount = account;
-    contractInstance.newLoan(web3.toWei(amount,'ether'),date,{gas: GAS_AMOUNT, from: account}).then(function() {
-      console.log("CREATED NEW LOAN");
+    contractInstance.newLoan(web3.toWei(amount,'ether'),date,mortgage,{gas: GAS_AMOUNT, from: account}).then(function() {
       refreshPage();
     });
   });
@@ -198,7 +199,8 @@ $( document ).ready(function() {
     evt.preventDefault();
     var amount = $('#newloan-amount').val();
     var date = new Date($('#newloan-date').val()).getTime()/1000;
-    newLoan(amount,date);
+    var mortgage = $('#newloan-mortgage').val();
+    newLoan(amount,date,mortgage);
   });
 
   // $('#loan-rows tbody').on( 'click', 'button', function (event) {

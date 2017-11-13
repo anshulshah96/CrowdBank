@@ -62,6 +62,9 @@ function populateProposals() {
           }
           $("#proposal-rows").append("<tr id='proposal"+i+"'>\
             <td>" + el[1].valueOf() + "</td>\
+            <td>" + el[5].valueOf()/wtoE + " eth</td>\
+            <td>"+new Date(el[6].valueOf()*1000).toDateString()+"</td>\
+            <td><a target='_blank' href='http://mortgage.crowdbank.gov.in:8080/verify.html?hash="+web3.toUtf8(el[7].valueOf())+"'>Link</a></td>\
             <td>" + PROPOSALSTATE[el[2].valueOf()]  + "</td>\
             <td>" + el[3].valueOf() + "</td>\
             <td>" + el[4].valueOf()/wtoE + "</td>\
@@ -94,15 +97,26 @@ function populateRecentLoans() {
       for(var i = 0; i < 10 && numLoans-1-i >= 0; i++) {
         contractInstance.loanList(numLoans-1-i).then(function(el) {
           var loanId = (numLoans-1-(ccount));
-          var amountHTML = "<input type='number' id='lendinput"+loanId+"'></input>";
-          var rateHTML = "<input type='number' id='lendrate"+loanId+"'></input>";
-          var btnHTML = "<button class='btn btn-success' onclick='proposeLend("+loanId+")'>✔</button>";
-          $("#recent-loan-rows").append("<tr class='"+LOANSTATECLASS[el[0].valueOf()]+"'>\
+          var amountHTML;
+          var rateHTML;
+          var btnHTML;
+          if(el[1].valueOf() == 0){
+            amountHTML = "<input type='number' id='lendinput"+loanId+"'></input>";
+            rateHTML = "<input type='number' id='lendrate"+loanId+"'></input>";
+            btnHTML = "<button class='btn btn-success' onclick='proposeLend("+loanId+")'>✔</button>";
+          }
+          else {
+            amountHTML = "-";
+            rateHTML = "-";
+            btnHTML = "-";
+          }
+          $("#recent-loan-rows").append("<tr class='"+LOANSTATECLASS[el[1].valueOf()]+"'>\
             <td>" + (numLoans-1-(ccount++)) + "</td>\
             <td>" + el[0].valueOf() + "</td>\
             <td>" + LOANSTATE[el[1].valueOf()] + "</td>\
-            <td>" + Date(el[2].valueOf())  + "</td>\
+            <td>" + new Date(el[2].valueOf()*1000).toDateString() + "</td>\
             <td>" + el[3].valueOf()/wtoE + "</td>\
+            <td><a target='_blank' href='http://mortgage.crowdbank.gov.in:8080/verify.html?hash="+web3.toUtf8(el[7].valueOf())+"'>Link</a></td>\
             <td>" + amountHTML  + "</td>\
             <td>" + rateHTML  + "</td>\
             <td>" + btnHTML  + "</td>\

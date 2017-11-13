@@ -32,6 +32,7 @@ contract CrowdBank {
         uint proposalCount;
         uint collected;
         uint startDate;
+        bytes32 mortgage;
         mapping (uint=>uint) proposal;
     }
 
@@ -54,10 +55,10 @@ contract CrowdBank {
         return false;
     }
     
-    function newLoan(uint amount, uint dueDate) {
+    function newLoan(uint amount, uint dueDate, bytes32 mortgage) {
         if(hasActiveLoan(msg.sender)) return;
         uint currentDate = block.timestamp;
-        loanList.push(Loan(msg.sender, LoanState.ACCEPTING, dueDate, amount, 0, 0, currentDate));
+        loanList.push(Loan(msg.sender, LoanState.ACCEPTING, dueDate, amount, 0, 0, currentDate, mortgage));
         loanMap[msg.sender].push(loanList.length-1);
     }
 
@@ -105,9 +106,9 @@ contract CrowdBank {
         return lendMap[lender].length;
     }
 
-    function getProposalAtPosFor(address lender, uint pos) constant returns(address, uint, ProposalState, uint, uint) {
+    function getProposalAtPosFor(address lender, uint pos) constant returns(address, uint, ProposalState, uint, uint, uint, uint, bytes32) {
         Proposal prop = proposalList[lendMap[lender][pos]];
-        return (prop.lender, prop.loanId, prop.state, prop.rate, prop.amount);
+        return (prop.lender, prop.loanId, prop.state, prop.rate, prop.amount, loanList[prop.loanId].amount, loanList[prop.loanId].dueDate, loanList[prop.loanId].mortgage);
     }
 
 // BORROWER ACTIONS AVAILABLE    
@@ -116,9 +117,9 @@ contract CrowdBank {
         return loanMap[borrower].length;
     }
 
-    function getLoanDetailsByAddressPosition(address borrower, uint pos) constant returns(LoanState, uint, uint, uint, uint, uint) {
+    function getLoanDetailsByAddressPosition(address borrower, uint pos) constant returns(LoanState, uint, uint, uint, uint,bytes32) {
         Loan obj = loanList[loanMap[borrower][pos]];
-        return (obj.state, obj.dueDate, obj.amount, obj.proposalCount, obj.collected, loanMap[borrower][pos]);
+        return (obj.state, obj.dueDate, obj.amount, obj.collected, loanMap[borrower][pos], obj.mortgage);
     }
 
     function getLastLoanState(address borrower) constant returns(LoanState) {

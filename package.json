@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint ./",
     "build": "webpack",
-    "dev": "webpack-dev-server"
+    "dev": "webpack-dev-server --host 0.0.0.0"
   },
   "author": "Douglas von Kohorn",
   "license": "MIT",
@@ -32,6 +32,11 @@
     "truffle-contract": "^1.1.11",
     "web3": "^0.20.0",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.3.0"
+    "webpack-dev-server": "^2.3.0",
+    "sha3": "^1.2.0"
+  },
+  "dependencies": {
+    "md5": "^2.2.1",
+    "sha3": "^1.2.0"
   }
 }
