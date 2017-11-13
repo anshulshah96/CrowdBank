@@ -21,14 +21,15 @@ There are several issues associated with centralised systems. Banks generally de
 Solution Abstract
 =====================
 
-The digitalisation of ownership proof in near future is inevitable and our system will leverage it as an government infrastructure. We propose a system of Peer to Peer loan backed by digital Mortgages. Our system is built on existing Ethereum currency ETH. 
+Our system leverages digital ownership management and proposes a system of Peer to Peer loan backed by digital Mortgages.
+CrowdBank - built on Ethereum is a web platform that connects lenders to borrowers. A person in need of money can create a loan request setting one of his assets as mortgage. The lenders can see the existing loan requests, verify the mortgage and based on his own risk assessment, propose the amount and a rate of interest. The borrower can choose from among the various proposals received and select a subset of them suiting his needs. On completion of the money requirement, the borrower can chose to repay the loan and clear his mortgage.
 
 Major benefits of using this decentralised system:
 1. No transaction limit.
 2. Individual's freedom to choose the risk associated.
-3. Reduction of Total Risk: Losses/Gains are randomly distributed and does not depend on one singular decisions.
-4. Open verifiability of the history associated (successful/failed loans) with a borrowers's account.
-
+3. Lenders will gain full interest without any broker's cuts. 
+4. Reduction of Total Risk: Losses/Gains are randomly distributed and does not depend on one singular decisions taken by bank.
+5. Open verifiability of the history associated (successful/failed loans) with a borrowers's account.
 
 System Architecture
 ===========================
