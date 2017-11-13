@@ -60,5 +60,5 @@ License
 
 The following people have been the contributors for the project:
  * [Anshul Shah](https://github.com/anshulshah96) 
- * [Nikhil Sheoran](https://github.com/nikhilsheoran96)
+ * [Nikhil Sheoran](https://github.com/nikhil96sher)
  * [Suraj Gupta](https://github.com/surajgupta97)
