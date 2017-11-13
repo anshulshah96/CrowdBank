@@ -2,7 +2,7 @@ LoanDe-centralised
 =========================
 ⚙️ Peer to Peer Loan System implemented on Ethereum Smart Contracts
 
-_Subission for Proffer's GENERATION BLOCKCHAIN at IIT Delhi_
+_Entry for Proffer's GENERATION BLOCKCHAIN Hackathon at IIT Delhi_
 
   * [Problem Statement](#problem-statement)
   * [Solution Abstract](#solution-abstract)
@@ -22,6 +22,13 @@ Solution Abstract
 
 The digitalisation of ownership proof in near future is inevitable and our system will leverage it as an government infrastructure. We propose a system of Peer to Peer loan backed by digital Mortgages. Our system is built on existing Ethereum currency ETH. 
 
+Major benefits of using this decentralised system:
+1. No transaction limit.
+2. Individual's freedom to choose the risk associated.
+3. Reduction of Total Risk: Losses/Gains are randomly distributed and does not depend on one singular decisions.
+4. Open verifiability of the history associated (successful/failed loans) with a borrowers's account.
+
+
 System Architecture
 ===========================
 
@@ -30,21 +37,21 @@ The ownership of **digital mortgage is publically verifiable** on a trusted gove
 2. **Interested lenders will judge the mortgage** and propose their desired lending amount and their rate of interest. 
 Borrower scrutinises the proposals and **Accepts** appropriate ones to achieve the target money. Other loans are **Reverted**. The funds are tranferred to the borrower.
 
-![Loan Proposal Architecture](https://user-images.githubusercontent.com/10174820/32730503-46ef430e-c8ad-11e7-9c5b-b096a21bbe95.png "Loan Proposal Architecture")
+![alt text](https://lh4.googleusercontent.com/oonjo_IALmIaF4nlc5O1Xyw0gAE8-EhjmQC8yM8v2CsdujjyPCzBr6cn6QwG8wc15kdKtdxGAzdBIQptuKVxbPUqcUNRq6tMmCkZPqd2NvK2yvZ_tUNotFe7lgEvFtMkzRm5Uppm "")
 
 3. **Payment Scenario 1:** The borrower will repay amount anytime he wishes before due date, the interest will be incurred on this time period only.
 4. **Payment Scenario 2:**  The due date passes, Any of the lender can now ask for mortgage transfer. The mortgage will be transferred to all the lenders stakewise.
 
-![Repayment Architecture](https://user-images.githubusercontent.com/10174820/32730525-54897b6a-c8ad-11e7-89f0-370cf5af8d27.png "Repayment Architecture")
+![alt text](https://lh4.googleusercontent.com/vUDc-Sa8psKmRGXyoGeq1F22_f20VpIOlBSqJ6upDfQKpJZhEl2C9sCrLJ3yvhtQN2URLva3yAgh4xNLPTe2MceL5jyPlWPqBDtQdlTK8ePJGRoZPN79dlXxu5n2By6Mk5a1uDrk "Logo Title Text 1")
 
 Setup
 ========
-1. Install [testrpc](https://github.com/ethereumjs/testrpc) and [Truffle Framework](https://truffle.readthedocs.io/en/beta/getting_started/installation/).
+1. Install [testrpc]() and [Truffle Framework]().
 2. Run ```git clone https://github.com/anshulshah96/LoanDe-centralised```
 3. Run ```npm install``` inside the directory.
 4. Run _testrpc_ in a new terminal.
 5. Run ```truffle deploy``` to build and deploy contract.
-6. Run ```npm run dev``` and go to [locahost:8080](localhost:8080).
+6. Run ```npm run dev``` and go to [locahost:8080](http://localhost:8080).
 
 License
 ===========
@@ -55,5 +62,3 @@ The following people have been the contributors for the project:
  * [Anshul Shah](https://github.com/anshulshah96) 
  * [Nikhil Sheoran](https://github.com/nikhilsheoran96)
  * [Suraj Gupta](https://github.com/surajgupta97)
-
-
