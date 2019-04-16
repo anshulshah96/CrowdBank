@@ -12,7 +12,7 @@ var CrowdBank = contract(bank_artifacts);
 var Mortgage = contract(bank_artifacts2);
 var account;
 var wtoE;
-var GAS_AMOUNT = 90000000;
+var GAS_AMOUNT = 1400000;
 
 var LOANSTATE = {
   0 : "ACCEPTING",
