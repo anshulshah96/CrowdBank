@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "md5": "^2.2.1",
-    "sha3": "^1.2.0"
+    "sha3": "^1.2.0",
+    "truffle-hdwallet-provider": "^1.0.6"
   }
 }
