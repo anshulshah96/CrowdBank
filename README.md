@@ -1,8 +1,11 @@
-CrowdBank
+P2P lending platform
 =========================
 ⚙️ Peer to Peer Loan System implemented on Ethereum Smart Contracts
 
-_Entry for [Proffer's GENERATION BLOCKCHAIN Hackathon](https://proffer.network/hackathon) at IIT Delhi_
+The project has been deployed at : https://cbank.consensolabs.com
+Contract deployed on Rinkeby:
+- CrowdBank contract address:  `0x231fD5ac30Fe1d3dfa925f0921c5fC244eA29271`
+- Morgage contract address:    `0xa24F83dBF112191398Be8Cb56AB078ebD3BF5FB7`
 
   * [Problem Statement](#problem-statement)
   * [Solution Abstract](#solution-abstract)
@@ -48,19 +51,14 @@ Borrower scrutinises the proposals and **Accepts** appropriate ones to achieve t
 
 Setup
 ========
-1. Install [testrpc]() and [Truffle Framework]().
-2. Run ```git clone https://github.com/anshulshah96/LoanDe-centralised```
+1. Install [ganache](https://truffleframework.com/ganache) and [Truffle Framework](https://truffleframework.com/truffle).
+2. Run ```git clone https://github.com/koshikraj/p2plending```
 3. Run ```npm install``` inside the directory.
-4. Run _testrpc_ in a new terminal.
-5. Run ```truffle deploy``` to build and deploy contract.
+4. Run  ganache-cli  in a new terminal.
+5. Run ```truffle migrate``` to build and deploy contract.
 6. Run ```npm run dev``` and go to [locahost:8080](http://localhost:8080).
 
 License
 ===========
-
-[MIT License](https://anshul.mit-license.org/)
-
-The following people have been the contributors for the project. (Go star their repos :p)
- * [Anshul Shah](https://github.com/anshulshah96) 
- * [Nikhil Sheoran](https://github.com/nikhil96sher)
- * [Suraj Gupta](https://github.com/surajgupta97)
+Original project: 
+Original project license: [MIT License](https://anshul.mit-license.org/)
