@@ -18,7 +18,9 @@ module.exports = {
       { from: './app/index.html', to: "index.html" },
       { from: './app/borrower.html', to: "borrower.html" },
       { from: './app/lender.html', to: "lender.html" },
-      { from: './app/verify.html', to: "verify.html" }
+      { from: './app/verify.html', to: "verify.html" },
+      { from: './app/usage.html', to: "usage.html" },
+      { from: './app/images', to: "images" }
     ])
   ],
   module: {
