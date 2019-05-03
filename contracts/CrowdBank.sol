@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 contract CrowdBank {
-    
+
     address public owner;
-    
+
     enum ProposalState {
         WAITING,
         ACCEPTED,
@@ -16,14 +16,14 @@ contract CrowdBank {
         uint rate;
         uint amount;
     }
-    
+
     enum LoanState {
         ACCEPTING,
         LOCKED,
         SUCCESSFUL,
         FAILED
     }
-    
+
     struct Loan {
         address borrower;
         LoanState state;
@@ -46,7 +46,19 @@ contract CrowdBank {
         owner = msg.sender;
     }
 
-     function hasActiveLoan(address borrower) public view returns(bool) {
+// Borrower side methods:
+
+
+    function newLoan(uint amount, uint dueDate, bytes32 mortgage) public {
+
+         // User cannot have more than one active loan
+         if(hasActiveLoan(msg.sender)) return;
+        uint currentDate = block.timestamp;
+        loanList.push(Loan(msg.sender, LoanState.ACCEPTING, dueDate, amount, 0, 0, currentDate, mortgage));
+        loanMap[msg.sender].push(loanList.length-1);
+    }
+
+    function hasActiveLoan(address borrower) public view returns(bool) {
         uint validLoans = loanMap[borrower].length;
         if(validLoans == 0) return false;
         Loan storage obj = loanList[loanMap[borrower][validLoans-1]];
@@ -55,51 +67,16 @@ contract CrowdBank {
         return false;
     }
 
-     function newLoan(uint amount, uint dueDate, bytes32 mortgage) public {
-        if(hasActiveLoan(msg.sender)) return;
-        uint currentDate = block.timestamp;
-        loanList.push(Loan(msg.sender, LoanState.ACCEPTING, dueDate, amount, 0, 0, currentDate, mortgage));
-        loanMap[msg.sender].push(loanList.length-1);
-    }
-
-     function newProposal(uint loanId, uint rate) public payable {
-        if(loanList[loanId].borrower == address(0) || loanList[loanId].state != LoanState.ACCEPTING)
-            return;
-        proposalList.push(Proposal(msg.sender, loanId, ProposalState.WAITING, rate, msg.value));
-        lendMap[msg.sender].push(proposalList.length-1);
-        loanList[loanId].proposalCount++;
-        loanList[loanId].proposal[loanList[loanId].proposalCount-1] = proposalList.length-1;
-    }
-
-     function getActiveLoanId(address borrower) public view returns(uint) {
-        uint numLoans = loanMap[borrower].length;
-        if(numLoans == 0) return (2**64 - 1);
-        uint lastLoanId = loanMap[borrower][numLoans-1];
-        if(loanList[lastLoanId].state != LoanState.ACCEPTING) return (2**64 - 1);
-        return lastLoanId;
-    }
-
-     function revokeMyProposal(uint id) public {
-        uint proposeId = lendMap[msg.sender][id];
-        if(proposalList[proposeId].state != ProposalState.WAITING) return;
-        uint loanId = proposalList[proposeId].loanId;
-        if(loanList[loanId].state == LoanState.ACCEPTING) {
-            // Lender wishes to revoke his ETH when proposal is still WAITING
-            proposalList[proposeId].state = ProposalState.REPAID;
-            msg.sender.transfer(proposalList[proposeId].amount);
+    function getActiveLoanId(address borrower) public view returns(uint) {
+            uint numLoans = loanMap[borrower].length;
+            if(numLoans == 0) return (2**64 - 1);
+            uint lastLoanId = loanMap[borrower][numLoans-1];
+            if(loanList[lastLoanId].state != LoanState.ACCEPTING) return (2**64 - 1);
+            return lastLoanId;
         }
-        else if(loanList[loanId].state == LoanState.LOCKED) {
-            // The loan is locked/accepting and the due date passed : transfer the mortgage
-            if(loanList[loanId].dueDate < now) return;
-            loanList[loanId].state = LoanState.FAILED;
-            for(uint i = 0; i < loanList[loanId].proposalCount; i++) {
-                uint numI = loanList[loanId].proposal[i];
-                if(proposalList[numI].state == ProposalState.ACCEPTED) {
-                    // transfer mortgage 
-                }
-            } 
-        }
-    }
+
+
+
 
      function lockLoan(uint loanId) public {
         //contract will send money to msg.sender
@@ -124,7 +101,7 @@ contract CrowdBank {
         else
           return;
     }
-    
+
     //Amount to be Repaid
      function getRepayValue(uint loanId) public view returns(uint) {
         if(loanList[loanId].state == LoanState.LOCKED)
@@ -182,7 +159,7 @@ contract CrowdBank {
 
      function acceptProposal(uint proposeId) public
     {
-        uint loanId = getActiveLoanId(msg.sender); 
+        uint loanId = getActiveLoanId(msg.sender);
         if(loanId == (2**64 - 1)) return;
         Proposal storage pObj = proposalList[proposeId];
         if(pObj.state != ProposalState.WAITING) return;
@@ -197,6 +174,78 @@ contract CrowdBank {
         }
     }
 
+
+
+// BORROWER ACTIONS AVAILABLE
+
+    function totalLoansBy(address borrower) public view returns(uint) {
+        return loanMap[borrower].length;
+    }
+
+    function getLoanDetailsByAddressPosition(address borrower, uint pos) public view returns(LoanState, uint, uint, uint, uint,bytes32) {
+        Loan storage obj = loanList[loanMap[borrower][pos]];
+        return (obj.state, obj.dueDate, obj.amount, obj.collected, loanMap[borrower][pos], obj.mortgage);
+    }
+
+    function getLastLoanState(address borrower) public view returns(LoanState) {
+        uint loanLength = loanMap[borrower].length;
+        if(loanLength == 0)
+        return LoanState.SUCCESSFUL;
+        return loanList[loanMap[borrower][loanLength -1]].state;
+    }
+
+    function getLastLoanDetails(address borrower) public view returns(LoanState, uint, uint, uint, uint) {
+        uint loanLength = loanMap[borrower].length;
+        Loan storage obj = loanList[loanMap[borrower][loanLength -1]];
+        return (obj.state, obj.dueDate, obj.amount, obj.proposalCount, obj.collected);
+    }
+
+    function getProposalDetailsByLoanIdPosition(uint loanId, uint numI) public view returns(ProposalState, uint, uint, uint, address) {
+        Proposal storage obj = proposalList[loanList[loanId].proposal[numI]];
+        return (obj.state, obj.rate, obj.amount, loanList[loanId].proposal[numI],obj.lender);
+    }
+
+    function numTotalLoans() public view returns(uint) {
+        return loanList.length;
+    }
+
+
+// Lender side methods:
+
+
+    function newProposal(uint loanId, uint rate) public payable {
+        if(loanList[loanId].borrower == address(0) || loanList[loanId].state != LoanState.ACCEPTING)
+            return;
+        proposalList.push(Proposal(msg.sender, loanId, ProposalState.WAITING, rate, msg.value));
+        lendMap[msg.sender].push(proposalList.length-1);
+        loanList[loanId].proposalCount++;
+        loanList[loanId].proposal[loanList[loanId].proposalCount-1] = proposalList.length-1;
+    }
+
+
+
+    function revokeMyProposal(uint id) public {
+        uint proposeId = lendMap[msg.sender][id];
+        if(proposalList[proposeId].state != ProposalState.WAITING) return;
+        uint loanId = proposalList[proposeId].loanId;
+        if(loanList[loanId].state == LoanState.ACCEPTING) {
+            // Lender wishes to revoke his ETH when proposal is still WAITING
+            proposalList[proposeId].state = ProposalState.REPAID;
+            msg.sender.transfer(proposalList[proposeId].amount);
+        }
+        else if(loanList[loanId].state == LoanState.LOCKED) {
+            // The loan is locked/accepting and the due date passed : transfer the mortgage
+            if(loanList[loanId].dueDate < now) return;
+            loanList[loanId].state = LoanState.FAILED;
+            for(uint i = 0; i < loanList[loanId].proposalCount; i++) {
+            uint numI = loanList[loanId].proposal[i];
+            if(proposalList[numI].state == ProposalState.ACCEPTED) {
+            // transfer mortgage
+                }
+            }
+        }
+    }
+
      function totalProposalsBy(address lender) public view returns(uint) {
         return lendMap[lender].length;
     }
@@ -206,37 +255,5 @@ contract CrowdBank {
         return (prop.lender, prop.loanId, prop.state, prop.rate, prop.amount, loanList[prop.loanId].amount, loanList[prop.loanId].dueDate, loanList[prop.loanId].mortgage);
     }
 
-// BORROWER ACTIONS AVAILABLE    
-
-     function totalLoansBy(address borrower) public view returns(uint) {
-        return loanMap[borrower].length;
-    }
-
-     function getLoanDetailsByAddressPosition(address borrower, uint pos) public view returns(LoanState, uint, uint, uint, uint,bytes32) {
-        Loan storage obj = loanList[loanMap[borrower][pos]];
-        return (obj.state, obj.dueDate, obj.amount, obj.collected, loanMap[borrower][pos], obj.mortgage);
-    }
-
-     function getLastLoanState(address borrower) public view returns(LoanState) {
-        uint loanLength = loanMap[borrower].length;
-        if(loanLength == 0)
-            return LoanState.SUCCESSFUL;
-        return loanList[loanMap[borrower][loanLength -1]].state;
-    }
-
-     function getLastLoanDetails(address borrower) public view returns(LoanState, uint, uint, uint, uint) {
-        uint loanLength = loanMap[borrower].length;
-        Loan storage obj = loanList[loanMap[borrower][loanLength -1]];
-        return (obj.state, obj.dueDate, obj.amount, obj.proposalCount, obj.collected);
-    }
-
-     function getProposalDetailsByLoanIdPosition(uint loanId, uint numI) public view returns(ProposalState, uint, uint, uint, address) {
-        Proposal storage obj = proposalList[loanList[loanId].proposal[numI]];
-        return (obj.state, obj.rate, obj.amount, loanList[loanId].proposal[numI],obj.lender);
-    }
-
-     function numTotalLoans() public view returns(uint) {
-        return loanList.length;
-    }
-    
 }
+
